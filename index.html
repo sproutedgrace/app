@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sprouted Grace Ministry · Rooted in His Words</title>
+<meta name="description" content="Read the Bible, learn, and pray with others. The words of Jesus in red, free lessons, and a kind place to share prayer requests. Rooted in His Words. Growing in Grace.">
+<meta name="theme-color" content="#FAF6EC">
+<link rel="canonical" href="https://app.sproutedgrace.net/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sprouted Grace Ministry">
+<meta property="og:title" content="Sprouted Grace Ministry · Rooted in His Words. Growing in Grace.">
+<meta property="og:description" content="Read the Bible with the words of Jesus in red. Learn, pray, and grow with others. Free to use.">
+<meta property="og:url" content="https://app.sproutedgrace.net/">
+<meta property="og:image" content="https://app.sproutedgrace.net/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A green sprout pushing up through cracked concrete, next to the Sprouted Grace Ministry logo: a sprout growing out of a gold box.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sprouted Grace Ministry · Rooted in His Words. Growing in Grace.">
+<meta name="twitter:description" content="Read the Bible with the words of Jesus in red. Learn, pray, and grow with others. Free to use.">
+<meta name="twitter:image" content="https://app.sproutedgrace.net/og-image.jpg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sprouted Grace">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="qrcode.js" defer></script>
+<script>
+/* ===================== SPROUTED GRACE SETTINGS =====================
+   SUPABASE: the link and anon (public) key from YOUR NEW church project.
+     If SUPABASE_URL still says YOUR-PROJECT, the app runs in PREVIEW MODE.
+   STRIPE_DONATE_URL: your Stripe payment link for gifts.
+   BTC_ADDRESS: your Bitcoin address for gifts.
+   PARTNER_ON: turn on the "Partner" access label in the Library (off = false). */
+const CONFIG = {
+  SUPABASE_URL: 'https://rvjfbyfxyqxwfzmaksra.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_RVm4zFPM8hymgogwuKOk6w_6jZPQw1F',
+  STRIPE_DONATE_URL: '',                 // example: https://donate.stripe.com/xxxxxx
+  BTC_ADDRESS: '',                       // example: bc1q...
+  TIKTOK_URL: 'https://www.tiktok.com/@sproutedgraceministry',
+  TIKTOK_HANDLE: '@sproutedgraceministry',
+  LIVE_DEFAULT: 'Live every Sabbath (Saturday) at 11 AM Central, unless posted otherwise.',
+  LIVE_DAY: 6, LIVE_HOUR: 11, LIVE_MINUTES: 90,   // Saturday, 11 AM Central, about 90 minutes
+  PARTNER_ON: false,
+  BIO_LIMIT: 160,
+  PDFJS: {
+    lib:    'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs',
+    worker: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs'
+  },
+  // Legal pages. Leave '' to use the built-in pages, or paste your own page's link.
+  LEGAL: { privacy: '', terms: '', accessibility: '' },
+  COPYRIGHT_HOLDER: 'Sprouted Grace Ministry',
+  COPYRIGHT_YEAR: '2026',
+  ADMIN_EMAIL: 'admin@sproutedgrace.net'
+};
+</script>
+<style>
+@font-face{font-family:'EB Garamond';src:url(fonts/EBGaramond-Regular.woff) format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'EB Garamond';src:url(fonts/EBGaramond-SemiBold.woff) format('woff');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'EB Garamond';src:url(fonts/EBGaramond-Italic.woff) format('woff');font-weight:400;font-style:italic;font-display:swap}
+:root{
+  --green:#239E46; --green-ink:#17733A; --lime:#65D916; --gold:#D4A017; --gold-ink:#8A6508; --white:#FFFFFF;
+  --bg:#FAF6EC; --paper:#FFFDF8; --edge:#E6DCC4; --line:#E9E0CB; --text:#2B2E28; --muted:#615F55;
+  --jesus:#B3141B;          /* red: only for the words of Jesus */
+  --hl1:#FCEFB4; --hl2:#D7F2C2; --hl3:#D4E8F7;
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --nav:68px; --r:14px; --scale:1;
+}
+html.night{
+  --bg:#191A16; --paper:#22231E; --edge:#3A382E; --line:#35332A; --text:#ECE6D6; --muted:#B4AE9C;
+  --green-ink:#6BCB86; --gold-ink:#E2B941; --jesus:#FF7B72; --hl1:#5A4C12; --hl2:#244A2C; --hl3:#1F3D57;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* faint linen weave */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(120,100,60,.035) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(120,100,60,.03) 0 1px,transparent 1px 4px)}
+html.night body::before{opacity:.15}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.2;color:var(--text)}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:var(--green-ink);font-weight:600;text-underline-offset:3px}
+.app{max-width:680px;margin:0 auto;min-height:100%;padding:0 16px calc(var(--nav) + env(safe-area-inset-bottom) + 24px)}
+
+/* header */
+.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(6px);margin:0 -16px 16px;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line)}
+.top::after{content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.brand img{width:42px;height:42px;display:block;object-fit:contain}
+.brand b{display:block;font-family:var(--serif);font-weight:600;font-size:21px;line-height:1.05;color:var(--green-ink)}
+.brand small{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.badge{font-size:11px;font-weight:700;letter-spacing:.12em;padding:5px 11px;border-radius:999px;border:1px solid var(--edge);color:var(--muted);white-space:nowrap;background:var(--paper)}
+.badge.admin{border-color:var(--gold);color:var(--gold-ink)}
+.preview-bar{font-size:13px;font-weight:600;text-align:center;padding:8px;border:1px dashed var(--gold);border-radius:10px;color:var(--gold-ink);margin-bottom:14px;background:var(--paper)}
+
+/* type */
+.hero{margin:6px 0 16px}
+.hero h1{font-size:32px;color:var(--text)}
+.hero p{color:var(--muted);margin-top:2px}
+.tagline{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--green-ink)}
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);margin:24px 0 12px}
+.eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.7}
+.note{font-size:15px;color:var(--muted)}
+.meta{font-size:13px;color:var(--muted)}
+
+/* cards */
+.card{background:var(--paper);border:1px solid var(--edge);border-radius:var(--r);padding:20px;margin-bottom:16px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 8px 22px rgba(90,70,30,.07)}
+.card h2{font-size:24px;margin-bottom:8px}
+.card p{margin-bottom:10px}.card p:last-child{margin-bottom:0}
+.card.gilt{border-top:3px solid var(--gold)}
+.card.dash{border-style:dashed;box-shadow:none;background:transparent}
+.ticks{list-style:none;margin:8px 0 12px}
+.ticks li{padding-left:26px;position:relative;margin:6px 0}
+.ticks li::before{content:"";position:absolute;left:2px;top:9px;width:12px;height:7px;border-left:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(-45deg)}
+
+/* buttons: big bold text so white on green stays easy to read */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 22px;border-radius:12px;border:1px solid #1C8A3C;background:var(--green);color:#fff;
+  font-family:var(--sans);font-weight:700;font-size:19px;cursor:pointer;text-decoration:none;min-height:50px;text-align:center;box-shadow:0 2px 0 #1A7A36}
+.btn:hover{filter:brightness(1.05)}
+a.btn{color:#fff}
+.btn.outline,a.btn.outline{background:var(--paper);color:var(--green-ink);border:1.5px solid var(--green);box-shadow:none;font-size:17px}
+.btn.gold,a.btn.gold{background:var(--paper);color:var(--gold-ink);border:1.5px solid var(--gold);box-shadow:none;font-size:17px}
+.btn.quiet{background:transparent;color:var(--muted);border:1px solid var(--edge);box-shadow:none;font-size:16px;font-weight:600}
+.btn.small{min-height:40px;padding:6px 14px;font-size:15px}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+label{display:block;font-weight:600;font-size:15px;margin:14px 0 6px;color:var(--text)}
+input,textarea,select{width:100%;background:var(--paper);border:1px solid #CFC4AA;border-radius:10px;padding:11px 13px;font-size:16px;color:var(--text)}
+html.night input,html.night textarea,html.night select{border-color:#4A473B}
+input::placeholder,textarea::placeholder{color:#8B887C}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(35,158,70,.18)}
+input[type=file]{padding:8px}
+input[type=checkbox],input[type=range]{width:auto;accent-color:var(--green)}
+textarea{min-height:110px;resize:vertical}
+.count{font-size:13px;color:var(--muted);text-align:right;margin-top:4px}
+.tabs{display:flex;border:1px solid var(--edge);border-radius:12px;overflow:hidden;margin-bottom:6px;background:var(--paper)}
+.tabs button{flex:1;background:transparent;border:0;padding:10px 6px;font-size:15px;line-height:1.3;font-weight:600;cursor:pointer;color:var(--muted)}
+.tabs button.on{background:var(--green);color:#fff}
+.optin{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:15px;margin:14px 0 0;cursor:pointer}
+.optin input{width:20px;height:20px;flex:none;margin-top:3px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin-bottom:8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--edge);border-radius:999px;padding:6px 12px;font-size:14.5px;font-weight:600;background:var(--paper);cursor:pointer;color:var(--text);text-decoration:none}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.chips.fit{gap:6px}.chips.fit .chip{flex:1 1 auto;text-align:center;padding:6px 7px;font-size:14px}
+
+/* home */
+.banner{position:relative;margin:0 0 16px;border-radius:var(--r);overflow:hidden;aspect-ratio:3/2;max-height:340px;width:100%;background:#6b5d4f;box-shadow:0 10px 26px rgba(60,45,20,.18)}
+.banner img{width:100%;height:100%;object-fit:cover;display:block}
+.banner .cap{position:absolute;left:0;right:0;bottom:0;padding:44px 18px 16px;background:linear-gradient(transparent,rgba(20,18,12,.78));color:#fff}
+.banner .cap b{display:block;font-family:var(--serif);font-weight:600;font-size:26px;line-height:1.15}
+.banner .cap span{display:block;font-family:var(--serif);font-style:italic;font-size:18px;opacity:.95;margin-top:2px}
+.votd{text-align:center;padding:26px 20px}
+.votd .ref{font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink)}
+.votd blockquote{font-family:var(--serif);font-size:calc(24px * var(--scale));line-height:1.4;margin:12px 0 14px;color:var(--text)}
+.live-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--lime);margin-right:6px;box-shadow:0 0 0 4px rgba(101,217,22,.2)}
+.next-live{font-family:var(--serif);font-size:22px;margin:4px 0 6px}
+.extra{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+
+/* scripture */
+.jw{color:var(--jesus)}
+.scripture{font-family:var(--serif);font-size:calc(21px * var(--scale));line-height:1.75;padding:22px 20px 26px}
+.scripture h2{font-size:calc(28px * var(--scale));text-align:center;margin-bottom:4px}
+.scripture .tr{text-align:center;font-family:var(--sans);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+.v{cursor:pointer;border-radius:4px;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:1px 0;transition:background .2s}
+.v sup{font-family:var(--sans);font-size:.55em;font-weight:700;color:var(--gold-ink);margin:0 3px 0 6px;vertical-align:.5em}
+.v.sel{outline:2px dashed var(--green);outline-offset:1px}
+.v.h1{background:var(--hl1)}.v.h2{background:var(--hl2)}.v.h3{background:var(--hl3)}
+.v .mk{font-family:var(--sans);font-size:.6em;color:var(--gold-ink);margin-left:3px;vertical-align:.4em}
+.v.flash{background:rgba(212,160,23,.28)}
+.bbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.bbar .pick{flex:1;justify-content:space-between}
+.seg{display:inline-flex;border:1.5px solid var(--green);border-radius:12px;overflow:hidden;flex:none}
+.seg button{border:0;background:var(--paper);color:var(--green-ink);font-weight:700;font-size:14px;padding:0 12px;min-height:40px;cursor:pointer}
+.seg button.on{background:var(--green);color:#fff}
+.bbar{flex-wrap:wrap}
+.trsel{width:100%;max-width:none;flex:1 1 100%;min-height:40px;padding:6px 8px;font-size:14px;font-weight:700;color:var(--green-ink);border:1.5px solid var(--green);border-radius:12px}
+.bbar .trsel:only-child{max-width:100%;width:100%}
+.xnote{text-align:center;font-family:var(--sans);font-size:13px;color:var(--muted);margin:-8px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.grid.books{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.grid button{min-height:46px;border:1px solid var(--edge);background:var(--paper);border-radius:10px;font-weight:600;cursor:pointer;color:var(--text);font-size:15px;padding:4px 6px}
+.grid button:hover{border-color:var(--green)}
+.pager{display:flex;justify-content:space-between;align-items:center;margin:14px 0;gap:12px}
+.result{display:block;width:100%;text-align:left;background:var(--paper);border:1px solid var(--edge);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;color:var(--text)}
+.result b{font-size:13px;letter-spacing:.06em;color:var(--gold-ink);text-transform:uppercase}
+.result .t{font-family:var(--serif);font-size:calc(19px * var(--scale));line-height:1.5;margin-top:2px}
+mark{background:var(--hl1);color:inherit;padding:0 1px;border-radius:3px}
+.rl-ch{font-family:var(--serif);font-size:22px;margin:22px 0 6px;color:var(--green-ink)}
+.rl-v{font-family:var(--serif);font-size:calc(20px * var(--scale));line-height:1.6;padding:6px 0;border-top:1px solid var(--line)}
+.rl-v a{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gold-ink);text-decoration:none;margin-right:6px}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--lime))}
+.day{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.day input{width:24px;height:24px;flex:none}
+.day.done .what{color:var(--muted);text-decoration:line-through}
+
+/* bottom sheet */
+.scrim{position:fixed;inset:0;background:rgba(20,18,10,.35);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--paper);border-radius:18px 18px 0 0;border-top:3px solid var(--gold);padding:16px 18px calc(18px + env(safe-area-inset-bottom));max-width:680px;margin:0 auto;box-shadow:0 -10px 30px rgba(0,0,0,.18);max-height:85vh;overflow:auto}
+.sheet h3{font-size:22px;margin-bottom:10px}
+.dots{display:flex;gap:12px;align-items:center;margin:4px 0 12px}
+.dots button{width:40px;height:40px;border-radius:50%;border:2px solid var(--edge);cursor:pointer}
+.dots button.on{border-color:var(--green);box-shadow:0 0 0 3px rgba(35,158,70,.25)}
+.acts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+
+/* library rows */
+.shelfrow{margin:0 -16px 8px;position:relative}
+.shelfrow .eyebrow{margin:22px 16px 10px}
+.track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 16px;scroll-padding-left:16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.track::-webkit-scrollbar{display:none}
+.poster{flex:none;width:150px;scroll-snap-align:start;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--text)}
+.cover{position:relative;width:150px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--paper);box-shadow:0 8px 20px rgba(90,70,30,.18);transition:transform .2s}
+.poster:hover .cover,.poster:focus-visible .cover{transform:translateY(-3px)}
+.cover img.full{width:100%;height:100%;object-fit:cover;display:block}
+.cover .ov{position:absolute;left:0;right:0;bottom:0;padding:30px 10px 10px;background:linear-gradient(transparent,rgba(20,30,20,.85));color:#fff;font-size:12.5px;line-height:1.35}
+.cover.gen{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 12px 14px;text-align:center;border:1px solid var(--edge);
+  background:radial-gradient(circle at 50% 25%,var(--paper),var(--bg) 75%)}
+.cover.gen::after{content:"";position:absolute;inset:6px;border:1px solid var(--gold);opacity:.55;border-radius:6px;pointer-events:none}
+.cover.gen .em{width:44px;height:44px;object-fit:contain}
+.cover.gen .mid{display:flex;flex-direction:column;align-items:center;gap:8px}
+.cover.gen .ct{font-family:var(--serif);font-weight:600;font-size:19px;line-height:1.15;color:var(--green-ink)}
+.cover.gen .cs{font-size:11.5px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cover.gen .ck{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--gold-ink);text-transform:uppercase}
+.cover .lock{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;z-index:2}
+.cover .lock svg{width:15px;height:15px}
+.poster .pt{font-weight:600;font-size:14px;line-height:1.3;margin-top:9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.poster .pl{font-size:12.5px;color:var(--muted);margin-top:2px}
+.poster.soonitem .cover{opacity:.8}
+.arrow{position:absolute;top:96px;width:36px;height:36px;border-radius:50%;border:1px solid var(--gold);background:var(--paper);color:var(--gold-ink);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;font-size:20px;line-height:1}
+.arrow.l{left:6px}.arrow.r{right:6px}
+@media (hover:none){.arrow{display:none}}
+.soon{flex:none;width:150px;aspect-ratio:2/3;border:1px dashed var(--gold);border-radius:10px;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center;padding:12px;color:var(--muted);font-size:14px}
+.soon b{font-family:var(--serif);font-weight:600;font-size:18px;color:var(--gold-ink)}
+
+/* reader for files */
+.reader-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+.back{background:var(--paper);border:1px solid var(--edge);border-radius:999px;padding:6px 14px;font-weight:600;cursor:pointer;color:var(--text)}
+.counter{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.reader-title{font-size:28px;margin-bottom:4px}
+.pill{display:inline-block;white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--gold);color:var(--gold-ink)}
+.pdfbox{overflow-x:auto;margin:12px 0}
+.pdfpage{margin:0 0 18px;text-align:center}
+.pdfpage canvas{display:block;margin:0 auto;border-radius:4px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.pdfpage figcaption{font-size:12px;color:var(--muted);margin-top:6px}
+.zoom{display:flex;gap:8px;flex-wrap:wrap}
+.media.audio{width:100%;margin:8px 0}
+video.media{width:100%;border-radius:var(--r);background:#000}
+.vidwrap{position:relative;padding-top:56.25%;border-radius:var(--r);overflow:hidden}
+.vidwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.locked{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:8px 0}
+.padlock{width:56px;height:56px;border-radius:50%;border:1px solid var(--gold);color:var(--gold-ink);display:flex;align-items:center;justify-content:center}
+.padlock svg{width:24px;height:24px}
+
+/* people */
+.ava{flex:none;border-radius:50%;object-fit:cover;background:#E5F3E8;color:var(--green-ink);display:inline-flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;border:1px solid var(--edge)}
+html.night .ava{background:#203626}
+.who{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.who b{font-weight:600}
+.who .un{font-size:13px;color:var(--muted);font-weight:500}
+.profile-hero{border-radius:var(--r);overflow:hidden;margin-bottom:16px;background:var(--paper);border:1px solid var(--edge)}
+.profile-hero .band{height:80px;background:linear-gradient(120deg,var(--green),var(--lime))}
+.profile-hero .inner{padding:0 20px 20px;margin-top:-44px}
+.profile-hero h1{font-size:26px;margin-top:10px}
+.bio{font-family:var(--serif);font-size:20px;line-height:1.45;margin-top:10px;border-left:2px solid var(--gold);padding-left:12px}
+
+/* fellowship */
+.thread{display:block;width:100%;text-align:left;background:var(--paper);border:1px solid var(--edge);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;cursor:pointer;color:var(--text)}
+.thread:hover{border-color:var(--green)}
+.thread h3{font-family:var(--sans);font-size:17px;font-weight:600;margin-bottom:4px;color:inherit}
+.post{padding:14px 0;border-top:1px solid var(--line)}
+.post .txt{white-space:pre-wrap;margin-top:8px;overflow-wrap:anywhere}
+.pray{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--gold);background:var(--paper);color:var(--gold-ink);border-radius:999px;padding:7px 16px;font-weight:700;cursor:pointer;font-size:15px}
+.pray.on{background:var(--gold);color:#2B2E28;border-color:var(--gold)}
+.hidden-name{font-size:13px;color:var(--gold-ink);font-weight:600}
+.rules li{margin:4px 0 4px 20px}
+
+/* admin */
+.adm-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.adm-item:first-child{border-top:0}
+.adm-item b{font-size:16px;display:block}
+.adm-item .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.stats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;text-align:center}
+.stats b{display:block;font-family:var(--serif);font-size:32px;font-weight:600;color:var(--green-ink)}
+
+/* giving */
+.addr{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;word-break:break-all;background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:10px 12px;margin:8px 0}
+.qr{display:flex;justify-content:center;margin:12px 0}
+.qr svg{width:200px;height:200px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--edge)}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--edge);box-shadow:0 -4px 18px rgba(90,70,30,.07)}
+.nav-in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--nav)}
+.nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--muted);font-size:11.5px;font-weight:600}
+.nav a svg{width:24px;height:24px}
+.nav a.on{color:var(--green-ink)}
+.nav a.on::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--lime)}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--nav) + 18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#2B2E28;color:#FAF6EC;padding:10px 18px;border-radius:10px;z-index:60;font-size:15px;max-width:90vw;text-align:center;border-left:4px solid var(--lime)}
+.empty{text-align:center;color:var(--muted);padding:24px 0}
+.hidden{display:none!important}
+.foot{text-align:center;margin:30px 0 6px;font-size:14px;color:var(--muted);line-height:1.9}
+.foot a{color:var(--muted);font-weight:500;margin:0 3px;white-space:nowrap}
+.foot .copy{display:block;margin-top:4px}
+.legal h2{font-size:21px;margin:18px 0 6px}.legal ul{margin:0 0 10px 22px}.legal li{margin-bottom:6px}
+
+/* accessibility */
+.skip{position:absolute;left:-9999px;top:8px;z-index:70;background:var(--paper);color:var(--text);padding:10px 14px;border-radius:10px}
+.skip:focus{left:12px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:6px}
+main:focus{outline:none}
+html.big .app{zoom:1.15}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#app" onclick="document.getElementById('app').focus();return false;">Skip to content</a>
+<main class="app" id="app" tabindex="-1"></main>
+<nav class="nav" aria-label="Main"><div class="nav-in" id="nav"></div></nav>
+<div id="sheetRoot"></div>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+
+<script>
+/* ============ ART ============ */
+const LOGO = 'logo.png';
+const I = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICONS = {
+  home: I('<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>'),
+  bible: I('<path d="M5 4a2 2 0 0 1 2-2h12v18H7a2 2 0 0 0-2 2z"/><path d="M5 22V4"/><path d="M12 6v8M9 9h6"/>'),
+  library: I('<rect x="3" y="4" width="4" height="16" rx="1"/><rect x="9" y="4" width="4" height="16" rx="1"/><path d="M15.5 5.5l3.8-1 3 14.5-3.8 1z"/>'),
+  fellowship: I('<circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.6"/><path d="M3 20c.8-3.6 3.2-5.5 6-5.5s5.2 1.9 6 5.5"/><path d="M15.5 14.6c2.6.2 4.4 2 5 5.4"/>'),
+  account: I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
+  lock: I('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  search: I('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>')
+};
+const ACCESS_LABEL = {free:'Free', member:'Free account', partner:'Partner'};
+const KIND_LABEL = {pdf:'Guide', audio:'Audio', video:'Video', soon:'Coming soon'};
+
+/* ============ BIBLE BOOKS ============ */
+const BOOKS = [['Genesis',50],['Exodus',40],['Leviticus',27],['Numbers',36],['Deuteronomy',34],['Joshua',24],['Judges',21],['Ruth',4],['1 Samuel',31],['2 Samuel',24],['1 Kings',22],['2 Kings',25],['1 Chronicles',29],['2 Chronicles',36],['Ezra',10],['Nehemiah',13],['Esther',10],['Job',42],['Psalms',150],['Proverbs',31],['Ecclesiastes',12],['Song of Solomon',8],['Isaiah',66],['Jeremiah',52],['Lamentations',5],['Ezekiel',48],['Daniel',12],['Hosea',14],['Joel',3],['Amos',9],['Obadiah',1],['Jonah',4],['Micah',7],['Nahum',3],['Habakkuk',3],['Zephaniah',3],['Haggai',2],['Zechariah',14],['Malachi',4],
+  ['Matthew',28],['Mark',16],['Luke',24],['John',21],['Acts',28],['Romans',16],['1 Corinthians',16],['2 Corinthians',13],['Galatians',6],['Ephesians',6],['Philippians',4],['Colossians',4],['1 Thessalonians',5],['2 Thessalonians',3],['1 Timothy',6],['2 Timothy',4],['Titus',3],['Philemon',1],['Hebrews',13],['James',5],['1 Peter',5],['2 Peter',3],['1 John',5],['2 John',1],['3 John',1],['Jude',1],['Revelation',22],
+  ['1 Enoch',108],['1 Maccabees',16],['2 Maccabees',15]];
+const NT = 39, GOSPELS = [39,40,41,42];
+const TRANS = {kjv:'King James Version', web:'World English Bible', bsb:'Berean Standard Bible', bbe:'Bible in Basic English', gnv:'Geneva Bible (1599)', ylt:"Young's Literal Translation", dby:'Darby Translation'};
+// Other old books, after Revelation. These have one text each.
+const EXTRA = 66;
+const EXTRA_SRC = {66:'R. H. Charles translation (1917)', 67:'King James Version Apocrypha (1611)', 68:'King James Version Apocrypha (1611)'};
+const refName = (b,c,v) => `${b===18&&c?'Psalm':BOOKS[b][0]} ${c}${v?':'+v:''}`;
+// Verse of the Day. Most are words of Jesus. [book, chapter, verse]
+const VOTD = [[42,3,16],[42,14,6],[39,11,28],[42,8,12],[39,5,14],[42,15,5],[39,6,33],[42,14,27],[39,22,37],[42,13,34],[39,7,7],[42,10,10],[41,6,31],[42,11,25],[39,5,9],
+  [42,16,33],[39,28,20],[41,12,32],[42,6,35],[39,5,8],[42,15,12],[41,11,9],[39,18,20],[42,8,32],[39,6,34],[42,10,11],[41,12,7],[39,5,16],[42,4,14],[39,19,26],[42,15,13],
+  [41,6,37],[39,7,12],[42,14,1],[40,9,23],[39,5,44],[42,8,31],[41,17,21],[39,10,31],[42,12,46],[18,23,1],[18,46,10],[19,3,5],[22,40,31],[24,3,23],[49,4,7],[44,8,28]];
+const PLANS = {
+  jesus30: { title:'The Words of Jesus in 30 Days', line:'Read every word Jesus spoke in the four Gospels. About three chapters a day.',
+    days: (()=>{ const all=[]; GOSPELS.forEach(b=>{ for(let c=1;c<=BOOKS[b][1];c++) all.push([b,c]); }); const d=[]; for(let i=0;i<30;i++) d.push(all.slice(Math.round(i*all.length/30),Math.round((i+1)*all.length/30))); return d; })(), red:true },
+  psalms7: { title:'Psalms of Peace in 7 Days', line:'Seven well-loved Psalms for hard or busy weeks. One a day.', days:[23,27,46,91,103,121,139].map(c=>[[18,c]]) },
+  prov31: { title:'Proverbs in 31 Days', line:'One chapter of wise sayings for each day of the month.', days:Array.from({length:31},(_,i)=>[[19,i+1]]) }
+};
+
+/* ============ PREVIEW DATA (only used when Supabase keys are missing) ============ */
+const PREVIEW = {
+  rows:[{id:1,name:'The Red Letters',sort:1},{id:2,name:'Gospel of Thomas',sort:2},{id:3,name:'Teachings',sort:3},{id:4,name:'Study Guides',sort:4},{id:5,name:'Coming Soon',sort:5}],
+  volumes:[
+    {id:'rl-matthew',title:'Red Letters: Matthew',subtitle:'Every word Jesus spoke in Matthew.',status:'live',sort:1,kind:'pdf',tier:'free',row_id:1},
+    {id:'rl-john',title:'Red Letters: John',subtitle:'The words of Jesus in the Gospel of John.',status:'live',sort:2,kind:'pdf',tier:'member',row_id:1},
+    {id:'thomas',title:'The Gospel of Thomas',subtitle:'An old book of sayings of Jesus, with simple notes.',status:'live',sort:3,kind:'pdf',tier:'member',row_id:2},
+    {id:'teach-1',title:'Love Your Neighbor',subtitle:'A short teaching from a Sabbath live.',status:'live',sort:4,kind:'video',tier:'free',row_id:3},
+    {id:'teach-2',title:'The Lord’s Prayer',subtitle:'What each line of the prayer means.',status:'live',sort:5,kind:'audio',tier:'member',row_id:3},
+    {id:'guide-1',title:'How to Read the Bible',subtitle:'Easy first steps for new readers.',status:'live',sort:6,kind:'pdf',tier:'free',row_id:4},
+    {id:'soon-1',title:'Parables of Jesus',subtitle:'A study of the stories Jesus told.',status:'live',sort:7,kind:'soon',tier:'free',row_id:5}
+  ],
+  rooms:[{id:1,name:'Welcome',sort:1,kind:null},{id:2,name:'Prayer Requests',sort:2,kind:'prayer'},{id:3,name:'Testimonies',sort:3,kind:null},{id:4,name:'Bible Study',sort:4,kind:null},{id:5,name:'General',sort:5,kind:null}],
+  people:{a:{id:'a',username:'Evergreen',display_name:'Evergreen',is_admin:true,bio:'Rooted in His words. Glad you are here.'},
+          b:{id:'b',username:'hope_grows',display_name:'Ruth',bio:'Learning to pray every day.'}},
+  threads:[
+    {id:1,room_id:1,author_id:'a',anonymous:false,title:'Welcome! Say hello here.',body:'Tell us your first name and where you are from. We are glad you came.',created_at:new Date().toISOString(),prayed:0,posts:[{id:1,author_id:'b',body:'Hello from Ohio! Happy to be here.',created_at:new Date().toISOString()}]},
+    {id:2,room_id:2,author_id:null,anonymous:true,secret:'b',title:'Please pray for my mother',body:'She has surgery on Tuesday. Thank you.',created_at:new Date().toISOString(),prayed:4,posts:[]},
+    {id:3,room_id:2,author_id:'b',anonymous:false,title:'Pray for a new job',body:'I start looking next week.',created_at:new Date().toISOString(),prayed:2,posts:[]}
+  ],
+  live:[]
+};
+
+/* ============ STATE ============ */
+const S = { sb:null, preview:false, user:null, profile:null, isAdmin:false, isPartner:false, recovery:false,
+            volumes:[], allVolumes:[], rows:[], rooms:[], people:{}, demoUser:false, demoAdmin:false, demoPrayed:{} };
+const $app = document.getElementById('app');
+
+/* ============ HELPERS ============ */
+const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const when = iso => { try { return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'}); } catch(e){ return ''; } };
+const longDate = d => new Date(d).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.setAttribute('aria-hidden','true'); t.textContent=msg; document.body.appendChild(t);
+  const l=document.getElementById('live'); if(l){ l.textContent=''; setTimeout(()=>l.textContent=msg,50); } setTimeout(()=>t.remove(),4200); }
+function store(key,val){ try{ if(val===undefined) return JSON.parse(localStorage.getItem(key)||'null'); localStorage.setItem(key,JSON.stringify(val)); }catch(e){ return null; } }
+const signedIn = () => S.preview ? S.demoUser : !!S.user;
+const admin = () => S.preview ? S.demoAdmin : S.isAdmin;
+const partner = () => admin() || (!S.preview && S.isPartner);
+const canOpen = tier => tier==='free' || (tier==='member' && signedIn()) || (tier==='partner' && partner());
+const slug = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'item';
+const myName = () => S.profile?.display_name || S.user?.email || 'Friend';
+const myId = () => S.preview ? 'me' : S.user?.id;
+const previewOnly = () => { toast('Preview mode: this works on the live app.'); };
+async function copyText(t, ok='Copied.'){ try{ await navigator.clipboard.writeText(t); toast(ok); }catch(e){ prompt('Copy this:', t); } }
+// Start with a capital letter and end with a period.
+const tidyDesc = t => { t=String(t||'').trim().replace(/,\s*\./g,'.'); if(!t) return ''; t=t[0].toUpperCase()+t.slice(1); return /[.!?]$/.test(t)?t:t+'.'; };
+
+/* ============ PEOPLE ============ */
+function initials(name){ return esc(String(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase()); }
+function avatar(p, size=40){
+  const st = `width:${size}px;height:${size}px;font-size:${Math.round(size*.38)}px`;
+  return p?.avatar_url ? `<img class="ava" style="${st}" src="${esc(p.avatar_url)}" alt="">` : `<span class="ava" style="${st}" aria-hidden="true">${initials(p?.display_name||p?.username)}</span>`;
+}
+function whoLink(p, size=36){
+  if(!p) return `<span class="who">${avatar({display_name:'?'},size)}<span><b>A member</b><br><span class="un">Name hidden</span></span></span>`;
+  return `<a class="who" href="#/u/${esc(p.username||p.id)}">${avatar(p,size)}<span><b>${esc(p.display_name||p.username)}</b>${p.username?`<br><span class="un">@${esc(p.username)}</span>`:''}</span></a>`;
+}
+async function loadPeople(ids){
+  const need=[...new Set(ids.filter(Boolean))].filter(id=>!S.people[id]);
+  if(!need.length) return;
+  if(S.preview){ need.forEach(id=>S.people[id]=PREVIEW.people[id] || (id==='me'?{...S.profile,id:'me'}:null)); return; }
+  const { data } = await S.sb.from('public_profiles').select('*').in('id',need);
+  (data||[]).forEach(p=>S.people[p.id]=p);
+}
+
+/* ============ DATA ============ */
+async function loadProfile(){
+  if(S.preview){ S.profile = S.profile || {display_name:'Preview Friend', username:'preview'}; return; }
+  if(!S.user){ S.profile=null; S.isAdmin=false; S.isPartner=false; return; }
+  const { data } = await S.sb.rpc('my_profile');
+  S.profile = (Array.isArray(data)?data[0]:data) || {};
+  S.isAdmin = !!S.profile.is_admin; S.isPartner = !!S.profile.is_partner;
+  delete S.people[S.user.id];
+}
+async function loadLibrary(){
+  if(S.preview){ S.rows=PREVIEW.rows; S.allVolumes=PREVIEW.volumes; S.volumes=PREVIEW.volumes.filter(v=>v.status!=='hidden'); return; }
+  const [r,v] = await Promise.all([S.sb.from('library_rows').select('*').order('sort'), S.sb.from('volumes').select('*').order('sort')]);
+  if(r.error||v.error) toast('The Library did not load. Please try again.');
+  S.rows = r.data||[]; S.allVolumes = v.data||[]; S.volumes = S.allVolumes.filter(x=>x.status!=='hidden');
+}
+
+/* ============ NAV + HEADER + FOOTER ============ */
+function renderNav(active){
+  const items=[['home','Home','#/home'],['bible','Bible','#/bible'],['library','Library','#/library'],['fellowship','Fellowship','#/fellowship'],['account','Account','#/account']];
+  document.getElementById('nav').innerHTML = items.map(([k,l,h])=>`<a href="${h}" class="${k===active?'on':''}" ${k===active?'aria-current="page"':''}>${ICONS[k]}<span>${l}</span></a>`).join('');
+}
+function header(){
+  const b = !signedIn() ? '' : admin() ? '<span class="badge admin">ADMIN</span>' : '<span class="badge">MEMBER</span>';
+  return `<div class="top"><a class="brand" href="#/home"><img src="${LOGO}" alt=""><span><b>Sprouted Grace</b><small>Ministry</small></span></a>${b}</div>
+  ${S.preview?'<div class="preview-bar">Preview mode · not connected to Supabase yet</div>':''}`;
+}
+function hero(title, line){ return `<div class="hero"><h1>${title}</h1>${line?`<p>${line}</p>`:''}</div>`; }
+function legalHref(k){ return CONFIG.LEGAL[k] || '#/legal/'+k; }
+const copyLine = () => `© ${CONFIG.COPYRIGHT_YEAR} ${CONFIG.COPYRIGHT_HOLDER}. All rights reserved.`;
+function footer(){
+  const ext = k => CONFIG.LEGAL[k] ? ' target="_blank" rel="noopener"' : '';
+  return `<footer class="foot"><span class="copy">${esc(copyLine())}</span>
+    <a href="${esc(legalHref('terms'))}"${ext('terms')}>Terms</a> · <a href="${esc(legalHref('privacy'))}"${ext('privacy')}>Privacy</a> · <a href="${esc(legalHref('accessibility'))}"${ext('accessibility')}>Accessibility</a> · <a href="mailto:${esc(CONFIG.ADMIN_EMAIL)}">${esc(CONFIG.ADMIN_EMAIL)}</a>
+  </footer>`;
+}
+function padlock(){ return `<div class="padlock">${ICONS.lock}</div>`; }
+function joinGate(title, line){
+  return `<div class="card" style="text-align:center"><div class="locked">${padlock()}<h2>${esc(title)}</h2><p>${esc(line)}</p>
+  <div class="row" style="justify-content:center;margin-top:4px"><a class="btn" href="#/account" onclick="authTab='up'">Make a Free Account</a><a class="btn outline" href="#/account" onclick="authTab='in'">Sign In</a></div></div></div>`;
+}
+
+/* ============ BIBLE DATA ============ */
+const BIB = {extra:{}};
+const bk = (tr,b) => b>=EXTRA ? BIB.extra : (BIB[tr] ||= {});
+async function getBook(tr, b){
+  const box = bk(tr,b);
+  if(box[b]) return box[b];
+  const r = await fetch(b>=EXTRA ? `bible/extra/${b+1}.json` : `bible/${tr}/${b+1}.json`);
+  if(!r.ok) throw new Error('This book did not load. Check your connection and try again.');
+  return (box[b] = (await r.json()).c);
+}
+async function getAll(tr, onStep){
+  let done=0; const out=[];
+  for(let i=0;i<66;i+=11){
+    const part = await Promise.all(BOOKS.slice(i,i+11).map((_,k)=>getBook(tr,i+k).then(x=>{ onStep&&onStep(++done); return x; })));
+    out.push(...part);
+  }
+  return out;
+}
+const plain = t => String(t||'').replace(/[{}]/g,'');
+const redHTML = t => esc(t).replace(/\{/g,'<span class="jw">').replace(/\}/g,'</span>');
+const redOnly = t => (String(t||'').match(/\{[^}]*\}/g)||[]).map(s=>s.slice(1,-1)).join(' … ');
+const BKEY='sg.bible';
+function bstate(){ const s=store(BKEY)||{}; s.hl ||= {}; s.bm ||= {}; s.notes ||= {}; s.plans ||= {}; s.pos ||= {tr:'kjv',b:42,c:1}; s.size ||= 1; return s; }
+function bsave(s){ s.updated=Date.now(); store(BKEY,s); }
+function applyLook(){ const s=bstate(); document.documentElement.style.setProperty('--scale', s.size||1); document.documentElement.classList.toggle('night', !!s.night);
+  document.querySelector('meta[name=theme-color]').content = s.night ? '#191A16' : '#FAF6EC'; }
+const rk = (b,c,v) => `${b}.${c}.${v}`;
+
+/* ============ HOME ============ */
+function dayIndex(){ const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); return Math.floor(Date.parse(p+'T00:00:00Z')/864e5); }
+function chiParts(d){ const o={}; new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',weekday:'short'}).formatToParts(d).forEach(p=>o[p.type]=p.value); return o; }
+function chicagoDate(y,m,d,h,mi){   // a Central time -> real Date
+  let t = Date.UTC(y,m-1,d,h,mi);
+  for(let i=0;i<2;i++){ const p=chiParts(new Date(t)); const asUtc=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute); t += Date.UTC(y,m-1,d,h,mi) - asUtc; }
+  return new Date(t);
+}
+function nextDefaultLive(){
+  const now=new Date();
+  for(let i=0;i<8;i++){
+    const p=chiParts(new Date(now.getTime()+i*864e5));
+    const start=chicagoDate(+p.year,+p.month,+p.day,CONFIG.LIVE_HOUR,0);
+    if(chiParts(start).weekday!==['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][CONFIG.LIVE_DAY]) continue;
+    if(start.getTime()+CONFIG.LIVE_MINUTES*6e4 > now.getTime()) return start;
+  }
+  return null;
+}
+const fmtCentral = d => new Date(d).toLocaleString('en-US',{timeZone:'America/Chicago',weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}).replace(':00','') + ' Central';
+async function loadLive(){
+  if(S.preview) return PREVIEW.live;
+  const { data } = await S.sb.from('live_times').select('*').gte('starts_at', new Date(Date.now()-3*36e5).toISOString()).order('starts_at').limit(10);
+  return data||[];
+}
+async function viewHome(){
+  renderNav('home');
+  const pick = VOTD[((dayIndex()%VOTD.length)+VOTD.length)%VOTD.length];
+  const tr = bstate().pos.tr || 'kjv';
+  $app.innerHTML = header()+`
+  <div class="banner"><img src="hero.jpg" alt="A small green plant pushing up through cracked concrete."><div class="cap"><b>Rooted in His Words.<br>Growing in Grace.</b><span>Nothing can box in what God grows.</span></div></div>
+  <div class="card gilt votd" id="votd"><div class="ref">Verse of the Day</div><blockquote>…</blockquote></div>
+  <div class="card" id="liveCard"><h2>Join us live</h2><p class="note">Loading…</p></div>
+  <div class="card"><h2>Welcome, friend</h2>
+    <p>We are glad you are here. Sprouted Grace is a place to read God's Word, learn, and pray together. Jesus (Yahushua) is at the center of all we do.</p>
+    <p>A sprout can break through concrete. Life keeps growing, even in hard places. So can faith.</p>
+    <p>Come as you are. Take what helps. Everyone is welcome.</p>
+    <div class="row"><a class="btn" href="#/give">Give</a><button class="btn outline" id="prayBtn">Prayer Request</button></div></div>
+  ${footer()}`;
+  document.getElementById('prayBtn').onclick=()=>{
+    if(!signedIn()){ toast('Make a free account to share a prayer request.'); authTab='up'; location.hash='#/account'; return; }
+    location.hash='#/fellowship/new/prayer';
+  };
+  // verse
+  try{
+    const chs = await getBook(tr, pick[0]); const t = chs[pick[1]-1][pick[2]-1];
+    document.getElementById('votd').innerHTML = `<div class="ref">Verse of the Day</div><blockquote>${redHTML(t)}</blockquote>
+      <p class="meta" style="margin-bottom:12px">${esc(refName(...pick))} · ${tr.toUpperCase()}</p>
+      <div class="row" style="justify-content:center"><a class="btn outline small" href="#/bible/read/${tr}/${pick[0]}/${pick[1]}/${pick[2]}">Read the chapter</a><button class="btn quiet small" id="votdShare">Share</button></div>`;
+    document.getElementById('votdShare').onclick=()=>shareVerse(plain(t), refName(...pick), tr);
+  }catch(e){ document.getElementById('votd').innerHTML='<div class="ref">Verse of the Day</div><p class="note">The verse did not load. Please try again.</p>'; }
+  // live
+  const extras = await loadLive();
+  const def = nextDefaultLive();
+  const all = [...(def?[{starts_at:def.toISOString(),note:'Sabbath service',def:true}]:[]), ...extras].sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+  const next = all[0]; const now=Date.now();
+  const isLive = next && new Date(next.starts_at).getTime() <= now;
+  const lc = document.getElementById('liveCard'); if(!lc) return;
+  lc.innerHTML = `<h2>Join us live</h2><p>${esc(CONFIG.LIVE_DEFAULT)}</p>
+    ${next?`<p class="note" style="margin-top:6px">${isLive?'<span class="live-dot"></span><strong>We are live now.</strong>':'Next live:'}</p><p class="next-live">${esc(fmtCentral(next.starts_at))}</p>${next.note&&!next.def?`<p class="note">${esc(next.note)}</p>`:''}`:''}
+    ${extras.length?`<div style="margin-top:10px"><p class="note"><strong>Extra live times</strong></p>${extras.map(x=>`<div class="extra"><span>${esc(fmtCentral(x.starts_at))}${x.note?` · ${esc(x.note)}`:''}</span>${admin()?`<button class="btn quiet small" data-dlive="${x.id}">Remove</button>`:''}</div>`).join('')}</div>`:''}
+    <div class="row"><a class="btn" href="${esc(CONFIG.TIKTOK_URL)}" target="_blank" rel="noopener">Watch on TikTok</a></div>
+    <p class="note" style="margin-top:8px">We go live on TikTok at ${esc(CONFIG.TIKTOK_HANDLE)}.</p>
+    ${admin()?`<details style="margin-top:14px"><summary class="note" style="cursor:pointer;font-weight:700">Admin: post an extra live time</summary>
+      <label for="lvDate">Day</label><input id="lvDate" type="date"><label for="lvTime">Time (Central)</label><input id="lvTime" type="time" value="19:00">
+      <label for="lvNote">Short note (optional)</label><input id="lvNote" maxlength="80" placeholder="Example: Wednesday Bible study">
+      <div class="row"><button class="btn small" id="lvGo">Post live time</button></div></details>`:''}`;
+  lc.querySelectorAll('[data-dlive]').forEach(b=>b.onclick=async()=>{ if(S.preview){ PREVIEW.live=PREVIEW.live.filter(x=>x.id!=+b.dataset.dlive); return viewHome(); }
+    const { error } = await S.sb.from('live_times').delete().eq('id',+b.dataset.dlive); if(error) return toast(error.message); toast('Removed.'); viewHome(); });
+  const go=document.getElementById('lvGo'); if(go) go.onclick=async()=>{
+    const d=document.getElementById('lvDate').value, t=document.getElementById('lvTime').value, note=document.getElementById('lvNote').value.trim();
+    if(!d||!t) return toast('Pick a day and a time.');
+    const [y,m,dd]=d.split('-').map(Number), [h,mi]=t.split(':').map(Number);
+    const starts_at = chicagoDate(y,m,dd,h,mi).toISOString();
+    if(S.preview){ PREVIEW.live.push({id:Date.now(),starts_at,note}); toast('Preview: posted.'); return viewHome(); }
+    const { error } = await S.sb.from('live_times').insert({starts_at, note:note||null}); if(error) return toast(error.message); toast('Live time posted.'); viewHome();
+  };
+}
+
+/* ============ GIVE ============ */
+function viewGive(){
+  renderNav('home');
+  const addr = CONFIG.BTC_ADDRESS;
+  $app.innerHTML = header()+`<div class="reader-head"><button class="back" onclick="history.length>1?history.back():location.hash='#/home'">‹ Back</button></div>
+  ${hero('Give','Thank you for helping this ministry grow.')}
+  <div class="card gilt"><h2>Ways to give</h2><p>Your gift helps us share God's Word, go live each Sabbath, and keep this app free.</p>
+    <div class="card" style="margin:16px 0 12px;box-shadow:none"><h3 style="font-size:20px;margin-bottom:6px">Give with a card</h3>
+      ${CONFIG.STRIPE_DONATE_URL?`<p class="note">A safe Stripe page opens. You pick the amount.</p><div class="row"><a class="btn wide" href="${esc(CONFIG.STRIPE_DONATE_URL)}" target="_blank" rel="noopener">Give with a card</a></div>`:'<p class="note">Card giving opens soon.</p>'}</div>
+    <div class="card" style="margin:0;box-shadow:none"><h3 style="font-size:20px;margin-bottom:6px">Give with Bitcoin</h3>
+      ${addr?`<p class="note">Send any amount to this address. Scan the code or copy it.</p><div class="qr" id="qr" aria-label="QR code for our Bitcoin address"></div>
+        <div class="addr" id="btcAddr">${esc(addr)}</div><div class="row" style="margin-top:6px"><button class="btn outline" id="btcCopy">Copy address</button></div>
+        <p class="note" style="margin-top:10px">Please check the address before you send. Bitcoin gifts cannot be undone.</p>`:'<p class="note">Bitcoin giving opens soon.</p>'}</div>
+    <p class="note" style="margin-top:14px"><strong>Please note:</strong> gifts support the ministry and are not refunded.</p></div>
+  ${footer()}`;
+  if(addr){
+    document.getElementById('btcCopy').onclick=()=>copyText(addr,'Address copied.');
+    const draw=()=>{ if(!window.qrcode) return setTimeout(draw,200); const q=qrcode(0,'M'); q.addData('bitcoin:'+addr); q.make(); const el=document.getElementById('qr'); if(el) el.innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true}); };
+    draw();
+  }
+}
+
+/* ============ BIBLE ============ */
+function bibleTabs(on){
+  const t=[['read','Read','#/bible'],['search','Search','#/bible/search'],['red','Red Letters','#/bible/red'],['plans','Plans','#/bible/plans'],['saved','Saved','#/bible/saved']];
+  return `<div class="chips fit" role="navigation" aria-label="Bible">${t.map(([k,l,h])=>`<a class="chip ${k===on?'on':''}" href="${h}" ${k===on?'aria-current="page"':''}>${l}</a>`).join('')}</div>`;
+}
+function trSeg(tr){ return `<select class="trsel" data-trsel aria-label="Bible version">${Object.entries(TRANS).map(([k,l])=>`<option value="${k}" ${k===tr?'selected':''}>${esc(l)} (${k.toUpperCase()})</option>`).join('')}</select>`; }
+function closeSheet(){ document.getElementById('sheetRoot').innerHTML=''; document.querySelectorAll('.v.sel').forEach(x=>x.classList.remove('sel')); }
+function openSheet(html){
+  const root=document.getElementById('sheetRoot');
+  root.innerHTML = `<div class="scrim" id="scrim"></div><div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  document.getElementById('scrim').onclick=closeSheet;
+  const f=root.querySelector('button,textarea,input'); if(f) f.focus();
+  return root.querySelector('.sheet');
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
+async function shareVerse(text, ref, tr){
+  const msg = `“${text}” — ${ref} (${tr.toUpperCase()})`;
+  if(navigator.share){ try{ await navigator.share({text:msg+'\n'+location.origin}); return; }catch(e){ if(e.name==='AbortError') return; } }
+  copyText(msg, 'Copied. You can paste it anywhere.');
+}
+function lookSheet(rerender){
+  const s=bstate();
+  const sh=openSheet(`<h3>Reading settings</h3>
+    <label for="sz">Text size</label><input type="range" id="sz" min="0.85" max="1.6" step="0.05" value="${s.size}" style="width:100%">
+    <label class="optin"><input type="checkbox" id="nt" ${s.night?'checked':''}> Night reading (dark background)</label>
+    <div class="card dash" style="margin:16px 0 0"><p style="margin-bottom:6px"><strong>Read with no internet</strong></p><p class="note" id="offMsg">Save the ${TRANS[s.pos.tr]} on this phone. It is about 4 MB.</p>
+      <div class="row"><button class="btn outline small" id="offGo">Save for offline</button></div></div>
+    <div class="row"><button class="btn wide" id="shDone">Done</button></div>`);
+  sh.querySelector('#sz').oninput=e=>{ const st=bstate(); st.size=+e.target.value; bsave(st); applyLook(); };
+  sh.querySelector('#nt').onchange=e=>{ const st=bstate(); st.night=e.target.checked; bsave(st); applyLook(); };
+  sh.querySelector('#offGo').onclick=async e=>{ const b=e.target; b.disabled=true; const m=sh.querySelector('#offMsg');
+    try{ await getAll(s.pos.tr, n=>m.textContent=`Saving… ${n} of 66 books`); m.textContent='Saved. You can read this Bible with no internet.'; }catch(err){ m.textContent='It did not finish. Please try again.'; b.disabled=false; } };
+  sh.querySelector('#shDone').onclick=()=>{ closeSheet(); rerender&&rerender(); };
+}
+function bindTrSeg(onPick){ $app.querySelectorAll('[data-trsel]').forEach(x=>x.onchange=()=>{ const s=bstate(); s.pos.tr=x.value; bsave(s); onPick(x.value); }); }
+
+async function viewRead(tr, b, c, v){
+  renderNav('bible');
+  const s=bstate();
+  tr = TRANS[tr] ? tr : s.pos.tr; b = Math.max(0,Math.min(BOOKS.length-1, isNaN(b)?s.pos.b:b)); c = Math.max(1,Math.min(BOOKS[b][1], c||1));
+  s.pos={tr,b,c}; bsave(s);
+  $app.innerHTML = header()+bibleTabs('read')+`<div class="bbar">${b>=EXTRA?'':trSeg(tr)}<a class="btn outline small pick" href="#/bible/pick">${esc(refName(b,c))} <span aria-hidden="true">▾</span></a><button class="btn quiet small" id="aa" aria-label="Reading settings">Aa</button></div>
+    <article class="card scripture" id="chap"><p class="empty">Opening…</p></article>`;
+  bindTrSeg(t=>location.hash=`#/bible/read/${t}/${b}/${c}`);
+  document.getElementById('aa').onclick=()=>lookSheet();
+  let chs; try{ chs = await getBook(tr,b); }catch(e){ document.getElementById('chap').innerHTML=`<p class="empty">${esc(e.message)}</p>`; return; }
+  const verses = chs[c-1]||[];
+  const st=bstate();
+  const lo = b>=EXTRA ? EXTRA : 0, hi = b>=EXTRA ? BOOKS.length-1 : EXTRA-1;
+  const prev = c>1 ? [b,c-1] : b>lo ? [b-1,BOOKS[b-1][1]] : null;
+  const next = c<BOOKS[b][1] ? [b,c+1] : b<hi ? [b+1,1] : null;
+  const vHTML = (t,i) => { const k=rk(b,c,i+1); const h=st.hl[k]; return `<span class="v ${h?'h'+h:''}" data-v="${i+1}" tabindex="0" role="button" aria-label="Verse ${i+1}. Tap for options."><sup>${i+1}</sup>${redHTML(t)}${st.bm[k]?'<span class="mk" title="Bookmarked">🔖</span>':''}${st.notes[k]?'<span class="mk" title="Has a note">✎</span>':''}</span> `; };
+  document.getElementById('chap').innerHTML = `<h2>${esc(refName(b,c))}</h2><div class="tr">${b>=EXTRA?EXTRA_SRC[b]:TRANS[tr]}</div>${b>=EXTRA?'<p class="xnote">This book is not in most Bibles. It is here for study.</p>':''}<div>${verses.map((t,i)=>t?vHTML(t,i):'').join('')}</div>`;
+  $app.querySelector('.foot')?.remove();
+  $app.insertAdjacentHTML('beforeend', `<div class="pager"><button class="btn outline small" id="pv" ${prev?'':'disabled'}>‹ ${prev?esc(refName(...prev)):''}</button><button class="btn small" id="nx" ${next?'':'disabled'}>${next?esc(refName(...next)):''} ›</button></div>
+    <p class="note" style="text-align:center">Tap a verse to highlight, save, copy, or share it. Swipe to turn the page.</p>
+    <p class="note" style="text-align:center;font-size:13px;margin-top:6px">The King James Version and the World English Bible are in the public domain.</p>${footer()}`);
+  const go = p => { if(p) location.hash=`#/bible/read/${tr}/${p[0]}/${p[1]}`; };
+  document.getElementById('pv').onclick=()=>go(prev); document.getElementById('nx').onclick=()=>go(next);
+  // swipe to turn the page
+  const art=document.getElementById('chap'); let sx=0, sy=0;
+  art.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  art.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>70 && Math.abs(dy)<60) go(dx<0?next:prev); },{passive:true});
+  // tap a verse
+  art.querySelectorAll('.v').forEach(el=>{ const open=()=>verseSheet(tr,b,c,+el.dataset.v,plain(verses[+el.dataset.v-1]),el); el.onclick=open; el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } }; });
+  if(v){ const el=art.querySelector(`[data-v="${v}"]`); if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),1800); } }
+}
+function verseSheet(tr,b,c,v,text,el){
+  closeSheet(); el.classList.add('sel');
+  const k=rk(b,c,v), st=bstate(), ref=refName(b,c,v);
+  const sh=openSheet(`<h3>${esc(ref)}</h3>
+    <p class="note" style="margin-bottom:4px">Highlight</p>
+    <div class="dots">${[1,2,3].map(n=>`<button data-h="${n}" class="${st.hl[k]==n?'on':''}" style="background:var(--hl${n})" aria-label="Highlight color ${n}"></button>`).join('')}<button data-h="0" class="btn quiet small" style="width:auto;border-radius:10px">No color</button></div>
+    <div class="acts"><button class="btn outline small" id="sBm">${st.bm[k]?'Remove bookmark':'Bookmark'}</button><button class="btn outline small" id="sNote">${st.notes[k]?'Edit note':'Add note'}</button>
+      <button class="btn outline small" id="sCopy">Copy</button><button class="btn outline small" id="sShare">Share</button></div>
+    <div id="noteBox" class="hidden"><label for="nTxt">Your note (saved on this device)</label><textarea id="nTxt" maxlength="2000">${esc(st.notes[k]||'')}</textarea>
+      <div class="row"><button class="btn small" id="nSave">Save note</button>${st.notes[k]?'<button class="btn quiet small" id="nDel">Delete note</button>':''}</div></div>
+    <div class="row"><button class="btn quiet wide" id="sClose">Close</button></div>`);
+  const redo=()=>{ closeSheet(); route(true); };
+  sh.querySelectorAll('[data-h]').forEach(x=>x.onclick=()=>{ const s=bstate(); const n=+x.dataset.h; if(n) s.hl[k]=n; else delete s.hl[k]; bsave(s); redo(); });
+  sh.querySelector('#sBm').onclick=()=>{ const s=bstate(); if(s.bm[k]) delete s.bm[k]; else s.bm[k]=Date.now(); bsave(s); toast(s.bm[k]?'Bookmarked.':'Bookmark removed.'); redo(); };
+  sh.querySelector('#sNote').onclick=()=>{ sh.querySelector('#noteBox').classList.remove('hidden'); sh.querySelector('#nTxt').focus(); };
+  sh.querySelector('#nSave').onclick=()=>{ const s=bstate(); const t=sh.querySelector('#nTxt').value.trim(); if(t) s.notes[k]=t; else delete s.notes[k]; bsave(s); toast('Note saved.'); redo(); };
+  const nd=sh.querySelector('#nDel'); if(nd) nd.onclick=()=>{ const s=bstate(); delete s.notes[k]; bsave(s); toast('Note deleted.'); redo(); };
+  sh.querySelector('#sCopy').onclick=()=>{ copyText(`“${text}” — ${ref} (${tr.toUpperCase()})`); closeSheet(); };
+  sh.querySelector('#sShare').onclick=()=>{ shareVerse(text, ref, tr); closeSheet(); };
+  sh.querySelector('#sClose').onclick=closeSheet;
+}
+async function viewPick(b, c){
+  renderNav('bible');
+  const s=bstate(); const tr=s.pos.tr;
+  const top = header()+bibleTabs('read');
+  if(b===undefined || isNaN(b)){
+    const grid = (from,to) => `<div class="grid books">${BOOKS.slice(from,to).map((x,i)=>`<button data-b="${from+i}">${esc(x[0])}</button>`).join('')}</div>`;
+    $app.innerHTML = top+hero('Pick a book','Then pick a chapter and a verse.')+`<div class="eyebrow">Old Testament</div>${grid(0,NT)}<div class="eyebrow">New Testament</div>${grid(NT,66)}<div class="eyebrow">Other old books</div><p class="note" style="margin-bottom:10px">These books are not in most Bibles. They are here for study.</p>${grid(EXTRA,BOOKS.length)}${footer()}`;
+    $app.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>location.hash='#/bible/pick/'+x.dataset.b);
+    return;
+  }
+  if(!c){
+    $app.innerHTML = top+`<div class="reader-head"><button class="back" onclick="location.hash='#/bible/pick'">‹ Books</button></div>${hero(esc(BOOKS[b][0]),'Pick a chapter.')}
+      <div class="grid">${Array.from({length:BOOKS[b][1]},(_,i)=>`<button data-c="${i+1}">${i+1}</button>`).join('')}</div>${footer()}`;
+    $app.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>location.hash=`#/bible/pick/${b}/${x.dataset.c}`);
+    return;
+  }
+  let n=0; try{ n=(await getBook(tr,b))[c-1].length; }catch(e){}
+  $app.innerHTML = top+`<div class="reader-head"><button class="back" onclick="location.hash='#/bible/pick/${b}'">‹ Chapters</button></div>${hero(esc(refName(b,c)),'Pick a verse, or read the whole chapter.')}
+    <div class="row" style="margin:0 0 14px"><a class="btn wide" href="#/bible/read/${tr}/${b}/${c}">Read the whole chapter</a></div>
+    <div class="grid">${Array.from({length:n},(_,i)=>`<button data-v="${i+1}">${i+1}</button>`).join('')}</div>${footer()}`;
+  $app.querySelectorAll('[data-v]').forEach(x=>x.onclick=()=>location.hash=`#/bible/read/${tr}/${b}/${c}/${x.dataset.v}`);
+}
+let lastSearch = {q:'', jesus:false, scope:'all'};
+async function viewSearch(){
+  renderNav('bible');
+  const s=bstate(), tr=s.pos.tr;
+  $app.innerHTML = header()+bibleTabs('search')+`<div class="bbar">${trSeg(tr)}</div>
+  <form class="card" id="sForm" role="search"><label for="q" style="margin-top:0">Search for a word or phrase</label>
+    <input id="q" type="search" value="${esc(lastSearch.q)}" placeholder="Example: love one another" autocomplete="off" enterkeyhint="search">
+    <label for="scope">Where</label><select id="scope">${[['all','The whole Bible'],['ot','Old Testament'],['nt','New Testament'],['gospels','The four Gospels'],['extra','Other old books (Enoch, Maccabees)']].map(([k,l])=>`<option value="${k}" ${lastSearch.scope===k?'selected':''}>${l}</option>`).join('')}</select>
+    <label class="optin"><input type="checkbox" id="jo" ${lastSearch.jesus?'checked':''}> Only the words of Jesus</label>
+    <div class="row"><button class="btn" type="submit">${ICONS.search.replace('<svg','<svg width="20" height="20"')} Search</button></div></form>
+  <div id="res"></div>${footer()}`;
+  bindTrSeg(()=>viewSearch());
+  const run = async () => {
+    const q=document.getElementById('q').value.trim(); lastSearch={q, jesus:document.getElementById('jo').checked, scope:document.getElementById('scope').value};
+    const res=document.getElementById('res'); if(q.length<2){ res.innerHTML='<p class="empty">Type at least 2 letters.</p>'; return; }
+    res.innerHTML='<p class="empty" id="prog">Searching…</p>';
+    let books; try{ books = await getAll(tr, n=>{ const p=document.getElementById('prog'); if(p) p.textContent=`Searching… ${n} of 66 books`; }); }catch(e){ res.innerHTML=`<p class="empty">${esc(e.message)}</p>`; return; }
+    const norm = t => t.toLowerCase().replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[^a-z0-9' ]+/g,' ').replace(/\s+/g,' ');
+    const nq = norm(q).trim();
+    const range = {all:[0,66],ot:[0,NT],nt:[NT,66],gospels:[39,43],extra:[EXTRA,BOOKS.length]}[lastSearch.scope];
+    if(lastSearch.scope==='extra') for(let b=EXTRA;b<BOOKS.length;b++) books[b]=await getBook(tr,b);
+    const hits=[]; let total=0;
+    for(let b=range[0]; b<range[1]; b++) books[b].forEach((ch,ci)=>ch.forEach((t,vi)=>{
+      const hay = lastSearch.jesus ? redOnly(t) : plain(t);
+      if(hay && (' '+norm(hay)+' ').includes(nq)){ total++; if(hits.length<300) hits.push([b,ci+1,vi+1,t]); }
+    }));
+    const words = q.replace(/[^\p{L}\p{N}' ]+/gu,' ').trim().split(/\s+/).filter(w=>w.length>1).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+    const re = words.length ? new RegExp(`(${words.join('|')})`,'gi') : null;
+    const mark = html => re ? html.split(/(<[^>]+>)/).map(p=>p.startsWith('<')?p:p.replace(re,'<mark>$1</mark>')).join('') : html;
+    res.innerHTML = `<p class="note" style="margin:4px 0 10px">${total ? `${total} ${total===1?'verse':'verses'} found${total>300?'. Showing the first 300':''}.` : 'No verses found. Try fewer words.'}</p>`+
+      hits.map(([b,c,v,t])=>`<button class="result" data-go="${b}/${c}/${v}"><b>${esc(refName(b,c,v))}</b><div class="t">${mark(lastSearch.jesus?`<span class="jw">${esc(redOnly(t))}</span>`:redHTML(t))}</div></button>`).join('');
+    res.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>location.hash=`#/bible/read/${tr}/${x.dataset.go}`);
+  };
+  document.getElementById('sForm').onsubmit=e=>{ e.preventDefault(); document.getElementById('q').blur(); run(); };
+  if(lastSearch.q) run();
+}
+async function viewRed(g, c){
+  renderNav('bible');
+  const s=bstate(), tr=s.pos.tr;
+  g = GOSPELS.includes(g) ? g : 39;
+  $app.innerHTML = header()+bibleTabs('red')+hero('Red Letters','Only the words Jesus spoke, Gospel by Gospel.')+`<div class="bbar">${trSeg(tr)}</div>
+    <div class="chips">${GOSPELS.map(x=>`<a class="chip ${x===g?'on':''}" href="#/bible/red/${x}">${BOOKS[x][0]}</a>`).join('')}</div>
+    <div class="card scripture" id="rl" style="padding-top:12px"><p class="empty">Opening…</p></div>${footer()}`;
+  bindTrSeg(()=>viewRed(g,c));
+  const chs = await getBook(tr,g);
+  const html = chs.map((ch,ci)=>{ const vs = ch.map((t,vi)=>[vi+1,redOnly(t)]).filter(x=>x[1]);
+    return vs.length ? `<h3 class="rl-ch" id="rc${ci+1}">${esc(BOOKS[g][0])} ${ci+1}</h3>`+vs.map(([v,t])=>`<div class="rl-v"><a href="#/bible/read/${tr}/${g}/${ci+1}/${v}" aria-label="${esc(refName(g,ci+1,v))}">${ci+1}:${v}</a><span class="jw">${esc(t)}</span></div>`).join('') : ''; }).join('');
+  document.getElementById('rl').innerHTML = html || '<p class="empty">No red letters found.</p>';
+  if(c){ const el=document.getElementById('rc'+c); if(el) el.scrollIntoView(); }
+}
+function viewPlans(id){
+  renderNav('bible');
+  const s=bstate(), tr=s.pos.tr;
+  if(!PLANS[id]){
+    $app.innerHTML = header()+bibleTabs('plans')+hero('Reading plans','Pick a plan. Check off each day. Your progress stays on this device.')+
+      Object.entries(PLANS).map(([k,p])=>{ const done=Object.keys(s.plans[k]||{}).length; return `<div class="card"><h2>${esc(p.title)}</h2><p>${esc(p.line)}</p>
+        <div class="bar" aria-hidden="true"><i style="width:${Math.round(done/p.days.length*100)}%"></i></div><p class="note">${done} of ${p.days.length} days done</p>
+        <div class="row"><a class="btn ${done?'outline':''}" href="#/bible/plans/${k}">${done?'Keep going':'Start'}</a></div></div>`; }).join('')+footer();
+    return;
+  }
+  const p=PLANS[id], marks=s.plans[id]||{};
+  const label = items => items.map(([b,c])=>refName(b,c)).join(', ');
+  $app.innerHTML = header()+bibleTabs('plans')+`<div class="reader-head"><button class="back" onclick="location.hash='#/bible/plans'">‹ Plans</button></div>${hero(esc(p.title),esc(p.line))}
+    <div class="card">${p.days.map((items,i)=>`<div class="day ${marks[i]?'done':''}"><input type="checkbox" data-d="${i}" ${marks[i]?'checked':''} aria-label="Day ${i+1} done">
+      <div><b>Day ${i+1}</b><br><span class="what">${items.map(([b,c])=>`<a href="${p.red?`#/bible/red/${b}/${c}`:`#/bible/read/${tr}/${b}/${c}`}">${esc(refName(b,c))}</a>`).join(', ')}</span></div></div>`).join('')}
+    ${p.red?'<p class="note" style="margin-top:10px">Each link opens the Red Letters view, so you see the words of Jesus first.</p>':''}</div>${footer()}`;
+  $app.querySelectorAll('[data-d]').forEach(x=>x.onchange=()=>{ const st=bstate(); st.plans[id] ||= {}; if(x.checked) st.plans[id][x.dataset.d]=1; else delete st.plans[id][x.dataset.d]; bsave(st); x.closest('.day').classList.toggle('done',x.checked); });
+}
+let savedTab='bm';
+async function viewSaved(){
+  renderNav('bible');
+  const s=bstate(), tr=s.pos.tr;
+  const lists = { bm:Object.keys(s.bm).sort((a,b)=>s.bm[b]-s.bm[a]), hl:Object.keys(s.hl), notes:Object.keys(s.notes) };
+  const sortRef = arr => arr.sort((a,b)=>{ const x=a.split('.').map(Number), y=b.split('.').map(Number); return x[0]-y[0]||x[1]-y[1]||x[2]-y[2]; });
+  sortRef(lists.hl); sortRef(lists.notes);
+  const cur = lists[savedTab];
+  $app.innerHTML = header()+bibleTabs('saved')+hero('Saved','Your bookmarks, highlights, and notes. They stay on this device.')+`
+    <div class="tabs">${[['bm','Bookmarks'],['hl','Highlights'],['notes','Notes']].map(([k,l])=>`<button class="${savedTab===k?'on':''}" data-st="${k}">${l}<br>${lists[k].length}</button>`).join('')}</div>
+    <div id="sv" style="margin-top:12px">${cur.length?'<p class="empty">Opening…</p>':'<p class="empty">Nothing here yet. Tap any verse in the Bible to save it.</p>'}</div>
+    ${backupCard()}${footer()}`;
+  $app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ savedTab=b.dataset.st; viewSaved(); });
+  bindBackup();
+  if(!cur.length) return;
+  const need=[...new Set(cur.map(k=>+k.split('.')[0]))];
+  try{ await Promise.all(need.map(b=>getBook(tr,b))); }catch(e){}
+  document.getElementById('sv').innerHTML = cur.map(k=>{ const [b,c,v]=k.split('.').map(Number); const t=bk(tr,b)[b]?.[c-1]?.[v-1]||'';
+    return `<button class="result" data-go="${b}/${c}/${v}" ${s.hl[k]?`style="border-left:6px solid var(--hl${s.hl[k]})"`:''}><b>${esc(refName(b,c,v))}</b><div class="t">${redHTML(t)}</div>${s.notes[k]?`<p class="note" style="margin-top:6px">✎ ${esc(s.notes[k])}</p>`:''}</button>`; }).join('');
+  document.querySelectorAll('#sv [data-go]').forEach(x=>x.onclick=()=>location.hash=`#/bible/read/${tr}/${x.dataset.go}`);
+}
+function backupCard(){
+  if(!signedIn()) return `<div class="card dash" style="margin-top:16px"><h2>Keep them safe</h2><p>Make a free account to back up your highlights, bookmarks, notes, and plans. Then you can bring them to a new phone.</p><div class="row"><a class="btn outline" href="#/account" onclick="authTab='up'">Make a Free Account</a></div></div>`;
+  return `<div class="card" style="margin-top:16px"><h2>Back up</h2><p>Save a copy of your highlights, bookmarks, notes, and plans to your account. On a new phone, sign in and tap “Bring back.”</p>
+    <p class="note" id="bkWhen"></p><div class="row"><button class="btn" id="bkUp">Back up now</button><button class="btn outline" id="bkDown">Bring back</button></div></div>`;
+}
+function bindBackup(){
+  const up=document.getElementById('bkUp'); if(!up) return;
+  const w=document.getElementById('bkWhen');
+  if(!S.preview) S.sb.from('bible_backups').select('updated_at').maybeSingle().then(({data})=>{ if(w) w.textContent = data ? 'Last backup: '+longDate(data.updated_at)+'.' : 'No backup yet.'; });
+  up.onclick=async()=>{ if(S.preview) return previewOnly(); const s=bstate(); const data={hl:s.hl,bm:s.bm,notes:s.notes,plans:s.plans};
+    const { error } = await S.sb.from('bible_backups').upsert({ user_id:S.user.id, data, updated_at:new Date().toISOString() }); if(error) return toast(error.message); toast('Backed up to your account.'); viewSaved(); };
+  document.getElementById('bkDown').onclick=async()=>{ if(S.preview) return previewOnly();
+    const { data, error } = await S.sb.from('bible_backups').select('data,updated_at').maybeSingle(); if(error) return toast(error.message); if(!data) return toast('No backup found yet.');
+    if(!confirm('Bring back your backup? It will be added to what is on this phone.')) return;
+    const s=bstate(), d=data.data||{}; ['hl','bm','notes'].forEach(k=>Object.assign(s[k], d[k]||{}));
+    Object.entries(d.plans||{}).forEach(([k,v])=>{ s.plans[k]=Object.assign(s.plans[k]||{}, v); }); bsave(s); toast('Your saved verses are back.'); viewSaved(); };
+}
+
+/* ============ LIBRARY ============ */
+function poster(v, clone){
+  const access = v.tier||'free', soon = v.kind==='soon';
+  const lockIt = !soon && !canOpen(access);
+  const sub = v.subtitle ? esc(v.subtitle) : '';
+  const cover = v.cover_url ? `<img class="full" src="${esc(v.cover_url)}" alt="">${sub?`<span class="ov">${sub}</span>`:''}`
+    : `<img class="em" src="${LOGO}" alt=""><span class="mid"><span class="ct">${esc(v.title)}</span>${sub?`<span class="cs">${sub}</span>`:''}</span><span class="ck">${esc(KIND_LABEL[v.kind]||'Guide')}</span>`;
+  const label = soon ? 'Coming soon' : `${KIND_LABEL[v.kind]||'Guide'} · ${ACCESS_LABEL[access]}`;
+  return `<button class="poster ${soon?'soonitem':''}" data-vol="${esc(v.id)}" ${clone?'aria-hidden="true" tabindex="-1" inert data-clone="1"':''} aria-label="${esc(v.title)}. ${esc(label)}.${sub?' '+sub:''}">
+    <div class="cover ${v.cover_url?'':'gen'}">${lockIt?`<span class="lock" title="${esc(ACCESS_LABEL[access])}">${ICONS.lock}</span>`:''}${cover}</div>
+    <div class="pt">${esc(v.title)}</div><div class="pl">${esc(label)}</div></button>`;
+}
+function shelfRow(row){
+  const items = S.volumes.filter(v=>v.row_id===row.id);
+  const loop = items.length >= 3;
+  const cards = items.length ? (loop ? [...items.map(v=>poster(v,true)),...items.map(v=>poster(v,false)),...items.map(v=>poster(v,true))].join('') : items.map(v=>poster(v,false)).join(''))
+              : `<div class="soon"><b>Coming soon</b>New lessons will show up here.</div>`;
+  return `<section class="shelfrow" aria-label="${esc(row.name)}"><div class="eyebrow">${esc(row.name)}</div>
+    ${items.length>1?`<button class="arrow l" data-dir="-1" aria-label="Back in ${esc(row.name)}">‹</button><button class="arrow r" data-dir="1" aria-label="Next in ${esc(row.name)}">›</button>`:''}
+    <div class="track" data-n="${items.length}" data-loop="${loop?1:0}">${cards}</div></section>`;
+}
+function setupRows(){
+  document.querySelectorAll('.shelfrow').forEach(row=>{
+    const track=row.querySelector('.track'); const n=+track.dataset.n; const loop=track.dataset.loop==='1';
+    const first=track.querySelector('.poster'); if(!first) return;
+    const step = first.getBoundingClientRect().width + 14;
+    if(loop){
+      const setW = step*n; track.scrollLeft = setW;
+      let t; track.addEventListener('scroll',()=>{ clearTimeout(t); t=setTimeout(()=>{
+        if(track.scrollLeft < setW*0.5) track.scrollLeft += setW;
+        else if(track.scrollLeft >= setW*1.5) track.scrollLeft -= setW; },140); },{passive:true});
+    }
+    row.querySelectorAll('.arrow').forEach(a=>a.onclick=()=>{
+      const d=+a.dataset.dir;
+      if(!loop && d>0 && track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) return track.scrollTo({left:0,behavior:'smooth'});
+      if(!loop && d<0 && track.scrollLeft <= 4) return track.scrollTo({left:track.scrollWidth,behavior:'smooth'});
+      track.scrollBy({left:d*step,behavior:'smooth'});
+    });
+  });
+}
+async function viewLibrary(){
+  renderNav('library');
+  $app.innerHTML = header()+'<div class="empty">Opening the Library…</div>';
+  await loadLibrary();
+  $app.innerHTML = header()+hero('Library','Lessons, studies, and teachings. Swipe each row to look.')+`
+  ${signedIn()?'':`<div class="card"><h2>Free to start</h2><p>Many lessons are free to open now. A free account opens the rest.</p>
+    <div class="row"><a class="btn" href="#/account" onclick="authTab='up'">Make a Free Account</a><a class="btn outline" href="#/account" onclick="authTab='in'">Sign In</a></div></div>`}
+  ${S.rows.map(shelfRow).join('')}
+  ${admin()?'<div class="row"><a class="btn outline" href="#/admin">Open the Library manager</a></div>':''}${footer()}`;
+  $app.querySelectorAll('[data-vol]').forEach(b=>b.onclick=()=>{ const v=S.volumes.find(x=>x.id===b.dataset.vol); if(v?.kind==='soon') return toast('This one is coming soon.'); location.hash=`#/item/${b.dataset.vol}`; });
+  requestAnimationFrame(setupRows);
+}
+function embedUrl(u){
+  const y = String(u).match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/);
+  if(y) return 'https://www.youtube-nocookie.com/embed/'+y[1];
+  const m = String(u).match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if(m) return 'https://player.vimeo.com/video/'+m[1];
+  return null;
+}
+async function fileUrl(f){
+  if(!f || !f.file_path) return '';
+  if(f.bucket==='site') return f.file_path;
+  if(f.bucket==='library-public') return S.sb.storage.from('library-public').getPublicUrl(f.file_path).data.publicUrl;
+  const { data } = await S.sb.storage.from('library-sealed').createSignedUrl(f.file_path, 3600);
+  return data?.signedUrl || '';
+}
+async function pdfjs(){
+  if(!window.__pdfjs){ const m = await import(CONFIG.PDFJS.lib); m.GlobalWorkerOptions.workerSrc = CONFIG.PDFJS.worker; window.__pdfjs = m; }
+  return window.__pdfjs;
+}
+let pdfZoom = 1;
+async function renderPdf(url, box){
+  box.innerHTML = '<p class="empty">Opening…</p>';
+  try{
+    const lib = await pdfjs();
+    const doc = await lib.getDocument({ url }).promise;
+    box.innerHTML = '';
+    const width = Math.min(box.clientWidth || 360, 900);
+    for(let i=1;i<=doc.numPages;i++){
+      const page = await doc.getPage(i);
+      const base = page.getViewport({ scale:1 });
+      const scale = (width - 8) / base.width * pdfZoom;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const vp = page.getViewport({ scale: scale * dpr });
+      const fig = document.createElement('figure'); fig.className='pdfpage';
+      const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+      c.style.width = (vp.width/dpr)+'px'; c.setAttribute('role','img'); c.setAttribute('aria-label',`Page ${i}`);
+      const cap = document.createElement('figcaption'); cap.textContent = `Page ${i} of ${doc.numPages}`;
+      fig.append(c, cap); box.appendChild(fig);
+      await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    }
+  }catch(e){
+    console.error(e);
+    box.innerHTML = `<p class="empty">The lesson did not open here.</p><div class="row" style="justify-content:center"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open the PDF</a></div>`;
+  }
+}
+function bindPdf(url){
+  const box=document.getElementById('pdfbox');
+  document.getElementById('zIn').onclick=()=>{ pdfZoom=Math.min(2.5,pdfZoom+0.25); renderPdf(url, box); };
+  document.getElementById('zOut').onclick=()=>{ pdfZoom=Math.max(0.75,pdfZoom-0.25); renderPdf(url, box); };
+  renderPdf(url, box);
+}
+async function viewItem(id){
+  renderNav('library');
+  if(!S.volumes.length) await loadLibrary();
+  const v = S.volumes.find(x=>x.id===id);
+  if(!v){ $app.innerHTML=header()+'<div class="empty">Nothing here yet.</div>'; return; }
+  const frame = inner => header()+`
+  <div class="reader-head"><button class="back" onclick="location.hash='#/library'">‹ Library</button><span class="counter">${esc(KIND_LABEL[v.kind]||'')}</span></div>
+  <h1 class="reader-title">${esc(v.title)}</h1>${v.subtitle?`<p class="note" style="font-size:16px">${esc(v.subtitle)}</p>`:''}<p style="margin:8px 0"><span class="pill">${esc(ACCESS_LABEL[v.tier||'free'])}</span></p>${inner}${footer()}`;
+  if(!canOpen(v.tier||'free')){
+    const msg = v.tier==='partner' ? 'This lesson is for ministry partners. Questions? Email us.' : 'Make a free account to open this. It costs nothing.';
+    $app.innerHTML = frame(`<div class="card" style="text-align:center;margin-top:12px"><div class="locked">${padlock()}<p>${esc(msg)}</p>
+      ${v.tier==='partner'?`<a class="btn outline" href="mailto:${esc(CONFIG.ADMIN_EMAIL)}">Email us</a>`:`<a class="btn" href="#/account" onclick="authTab='up'">Make a Free Account</a>`}</div></div>`); return;
+  }
+  if(S.preview){ $app.innerHTML = frame(`<div class="card dash" style="margin-top:12px"><p>Preview: this ${esc((KIND_LABEL[v.kind]||'lesson').toLowerCase())} opens here on the live app.</p></div>`); return; }
+  $app.innerHTML = frame('<div class="empty">Opening…</div>');
+  const { data:f } = await S.sb.from('library_files').select('bucket,file_path,video_url').eq('volume_id',id).maybeSingle();
+  if(!f){ $app.innerHTML = frame('<div class="empty">This did not open. Please try again.</div>'); return; }
+  if(v.kind==='video' && f.video_url){
+    const e = embedUrl(f.video_url);
+    $app.innerHTML = frame(e ? `<div class="vidwrap" style="margin-top:12px"><iframe src="${esc(e)}" title="${esc(v.title)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+                             : `<div class="row"><a class="btn" href="${esc(f.video_url)}" target="_blank" rel="noopener">Watch</a></div>`); return;
+  }
+  const url = await fileUrl(f);
+  if(!url){ $app.innerHTML = frame('<div class="empty">This did not open. Please try again.</div>'); return; }
+  if(v.kind==='pdf'){
+    $app.innerHTML = frame(`<div class="zoom" style="margin-top:12px"><button class="btn outline small" id="zOut">Smaller</button><button class="btn outline small" id="zIn">Larger</button><a class="btn small" href="${esc(url)}" target="_blank" rel="noopener">Open PDF</a></div><div class="pdfbox" id="pdfbox"></div>`);
+    bindPdf(url); return;
+  }
+  if(v.kind==='audio'){ $app.innerHTML = frame(`<div class="card" style="margin-top:12px"><audio class="media audio" controls preload="metadata" src="${esc(url)}"></audio></div>`); return; }
+  $app.innerHTML = frame(`<video class="media" controls playsinline preload="metadata" src="${esc(url)}" style="margin-top:12px"></video>`);
+}
+
+/* ============ ADMIN: LIBRARY ============ */
+function adminTabs(which){ return `<div class="reader-head"><button class="back" onclick="location.hash='#/account'">‹ Account</button></div><div class="tabs" role="tablist" style="margin-bottom:16px"><button class="${which==='lib'?'on':''}" onclick="location.hash='#/admin'">Library</button><button class="${which==='members'?'on':''}" onclick="location.hash='#/admin/members'">Members</button></div>`; }
+const tierOptions = sel => ['free','member',...(CONFIG.PARTNER_ON||sel==='partner'?['partner']:[])].map(t=>`<option value="${t}" ${sel===t?'selected':''}>${t==='free'?'Free (no account needed)':t==='member'?'Free account (sign up)':'Partner'}</option>`).join('');
+const rowOptions = sel => S.rows.map(r=>`<option value="${r.id}" ${+sel===r.id?'selected':''}>${esc(r.name)}</option>`).join('');
+async function uploadCover(file){
+  if(file.size > 5*1024*1024) throw new Error('Cover images must be under 5 MB.');
+  const ext=(file.name.match(/\.[a-z0-9]+$/i)||['.jpg'])[0].toLowerCase();
+  const path=`covers/${Date.now()}-${slug(file.name.replace(/\.[^.]+$/,''))}${ext}`;
+  const { error } = await S.sb.storage.from('library-public').upload(path, file, { contentType:file.type||undefined, upsert:false });
+  if(error) throw error;
+  return S.sb.storage.from('library-public').getPublicUrl(path).data.publicUrl;
+}
+// Change who can open an item. Moves its file to the public or private folder to match.
+async function setAccess(id, tier){
+  const { data:f } = await S.sb.from('library_files').select('bucket,file_path').eq('volume_id',id).maybeSingle();
+  const want = tier==='free' ? 'library-public' : 'library-sealed';
+  if(f?.file_path && f.bucket && f.bucket!=='site' && f.bucket!==want){
+    const dl = await S.sb.storage.from(f.bucket).download(f.file_path); if(dl.error) throw dl.error;
+    const up = await S.sb.storage.from(want).upload(f.file_path, dl.data, { contentType:dl.data.type||undefined, upsert:true }); if(up.error) throw up.error;
+    const u1 = await S.sb.from('library_files').update({ bucket:want }).eq('volume_id',id); if(u1.error) throw u1.error;
+    await S.sb.storage.from(f.bucket).remove([f.file_path]);
+  }
+  const { error } = await S.sb.from('volumes').update({ tier }).eq('id',id); if(error) throw error;
+}
+async function viewAdmin(){
+  renderNav('account');
+  if(!admin()){ location.hash='#/account'; return; }
+  $app.innerHTML = header()+'<div class="empty">Opening…</div>';
+  await loadLibrary();
+  const items = S.allVolumes;
+  $app.innerHTML = header()+adminTabs('lib')+hero('Library manager','Add a lesson, audio, or video. It shows in the Library right away.')+`
+  <div class="card">
+    <label for="nTitle" style="margin-top:0">Title</label><input id="nTitle" maxlength="80" placeholder="Example: The Beatitudes">
+    <label for="nDesc">Short description (one sentence). Start with a capital letter. End with a period.</label><input id="nDesc" maxlength="90" placeholder="Example: What Jesus taught on the mountain.">
+    <label for="nRow">Row</label><select id="nRow">${rowOptions(S.rows[0]?.id)}</select>
+    <label for="nKind">Type</label><select id="nKind">
+      <option value="pdf">PDF lesson</option><option value="audio">Audio</option>
+      <option value="video-link">Video (YouTube or Vimeo link)</option><option value="video">Video (upload a file)</option><option value="soon">Coming soon (no file yet)</option></select>
+    <label for="nTier">Who can open it?</label><select id="nTier">${tierOptions('free')}</select>
+    <div id="nFileWrap"><label for="nFile">File</label><input id="nFile" type="file" accept="application/pdf"><p class="note" style="margin-top:6px">Up to 50 MB per file.</p></div>
+    <div id="nUrlWrap" class="hidden"><label for="nUrl">Video link</label><input id="nUrl" type="url" placeholder="https://youtu.be/…"></div>
+    <label for="nCover">Cover image (optional, tall shape works best)</label><input id="nCover" type="file" accept="image/*">
+    <div class="row"><button class="btn" id="nGo">Add to Library</button></div>
+  </div>
+  <div class="eyebrow">Rows</div>
+  <div class="card"><p class="note">Rename a row, or add a new one. Rows show in this order.</p>
+    ${S.rows.map((r,i)=>`<div class="row" style="margin-top:10px"><input data-rname="${r.id}" value="${esc(r.name)}" maxlength="40" aria-label="Row name" style="flex:1;min-width:150px">
+      <button class="btn quiet small" data-rup="${r.id}" ${i===0?'disabled':''} aria-label="Move up">↑</button><button class="btn outline small" data-rsave="${r.id}">Save</button></div>`).join('')}
+    <div class="row" style="margin-top:16px"><input id="newRow" maxlength="40" placeholder="New row name" style="flex:1;min-width:150px"><button class="btn small" id="addRow">Add row</button></div></div>
+  <div class="eyebrow">In the Library</div>
+  <div class="card">${items.length ? items.map(v=>`<div class="adm-item"><div style="min-width:0;flex:1"><b>${esc(v.title)}</b>
+     <span class="meta">${esc(KIND_LABEL[v.kind]||'')} · ${esc(ACCESS_LABEL[v.tier||'free'])}${v.status==='hidden'?' · <strong>Hidden</strong>':''}</span>
+     <div class="row" style="margin-top:8px;gap:6px"><select data-row="${esc(v.id)}" aria-label="Row for ${esc(v.title)}" style="padding:6px 10px;font-size:14px;width:auto">${rowOptions(v.row_id)}</select>
+     <select data-tier="${esc(v.id)}" aria-label="Access for ${esc(v.title)}" style="padding:6px 10px;font-size:14px;width:auto">${tierOptions(v.tier||'free')}</select></div></div>
+     <div class="btns"><label class="btn outline small" style="margin:0">Cover<input type="file" accept="image/*" data-cover="${esc(v.id)}" class="hidden"></label>
+       <button class="btn outline small" data-toggle="${esc(v.id)}">${v.status==='hidden'?'Show':'Hide'}</button>
+       <button class="btn quiet small" data-del="${esc(v.id)}">Delete</button></div></div>`).join('') : '<div class="empty">Nothing yet.</div>'}</div>${footer()}`;
+
+  const kindSel=document.getElementById('nKind');
+  kindSel.onchange=()=>{ const k=kindSel.value, link=k==='video-link', soon=k==='soon';
+    document.getElementById('nFileWrap').classList.toggle('hidden',link||soon); document.getElementById('nUrlWrap').classList.toggle('hidden',!link);
+    document.getElementById('nFile').accept = k==='pdf'?'application/pdf':k==='audio'?'audio/*':'video/*'; };
+  document.getElementById('nGo').onclick=async()=>{
+    const btn=document.getElementById('nGo');
+    const title=document.getElementById('nTitle').value.trim(), desc=tidyDesc(document.getElementById('nDesc').value);
+    const k=kindSel.value, tier=document.getElementById('nTier').value, kind = k==='video-link'?'video':k, row_id=+document.getElementById('nRow').value;
+    if(!title) return toast('Please add a title.');
+    if(!desc) return toast('Please add a short description.');
+    if(S.preview) return previewOnly();
+    let bucket=null, file_path=null, video_url=null, cover_url=null;
+    try{ const c=document.getElementById('nCover').files[0]; if(c) cover_url=await uploadCover(c); }catch(e){ return toast(e.message); }
+    if(k==='video-link'){ video_url=document.getElementById('nUrl').value.trim(); if(!/^https?:\/\//i.test(video_url)) return toast('Paste the full video link, starting with https://'); }
+    else if(k!=='soon'){
+      const file=document.getElementById('nFile').files[0];
+      if(!file) return toast('Please choose a file.');
+      if(file.size > 50*1024*1024) return toast('That file is over 50 MB.');
+      bucket = tier==='free' ? 'library-public' : 'library-sealed';
+      const ext = (file.name.match(/\.[a-z0-9]+$/i)||[''])[0].toLowerCase();
+      file_path = `${Date.now()}-${slug(file.name.replace(/\.[^.]+$/,''))}${ext}`;
+      btn.disabled=true; btn.textContent='Uploading…';
+      const { error } = await S.sb.storage.from(bucket).upload(file_path, file, { contentType:file.type||undefined, upsert:false });
+      if(error){ btn.disabled=false; btn.textContent='Add to Library'; return toast('Upload failed: '+error.message); }
+    }
+    btn.disabled=true; btn.textContent='Saving…';
+    const id = slug(title)+'-'+Date.now().toString(36).slice(-4);
+    const sort = Math.max(0, ...items.map(i=>i.sort||0)) + 1;
+    const r1 = await S.sb.from('volumes').insert({ id, title, subtitle:desc, status:'live', sort, kind, tier, row_id, cover_url });
+    const r2 = r1.error || k==='soon' ? r1 : await S.sb.from('library_files').insert({ volume_id:id, bucket, file_path, video_url });
+    if(r1.error || r2.error){
+      if(file_path) await S.sb.storage.from(bucket).remove([file_path]);
+      if(!r1.error) await S.sb.from('volumes').delete().eq('id',id);
+      btn.disabled=false; btn.textContent='Add to Library';
+      return toast('It did not save: '+(r1.error||r2.error).message);
+    }
+    toast('Added to the Library.'); viewAdmin();
+  };
+  $app.querySelectorAll('[data-rsave]').forEach(b=>b.onclick=async()=>{ const name=$app.querySelector(`[data-rname="${b.dataset.rsave}"]`).value.trim(); if(!name) return toast('Please add a name.');
+    if(S.preview){ PREVIEW.rows.find(r=>r.id==b.dataset.rsave).name=name; toast('Preview: saved.'); return viewAdmin(); }
+    const { error } = await S.sb.from('library_rows').update({name}).eq('id',+b.dataset.rsave); toast(error?error.message:'Row renamed.'); viewAdmin(); });
+  $app.querySelectorAll('[data-rup]').forEach(b=>b.onclick=async()=>{ const i=S.rows.findIndex(r=>r.id==b.dataset.rup); if(i<1) return; const a=S.rows[i-1], c=S.rows[i];
+    if(S.preview){ [a.sort,c.sort]=[c.sort,a.sort]; PREVIEW.rows.sort((x,y)=>x.sort-y.sort); return viewAdmin(); }
+    await S.sb.from('library_rows').update({sort:c.sort}).eq('id',a.id); const { error } = await S.sb.from('library_rows').update({sort:a.sort}).eq('id',c.id); if(error) toast(error.message); viewAdmin(); });
+  document.getElementById('addRow').onclick=async()=>{ const name=document.getElementById('newRow').value.trim(); if(!name) return toast('Please add a name.');
+    const sort=Math.max(0,...S.rows.map(r=>r.sort||0))+1;
+    if(S.preview){ PREVIEW.rows.push({id:Date.now(),name,sort}); toast('Preview: row added.'); return viewAdmin(); }
+    const { error } = await S.sb.from('library_rows').insert({name,sort}); toast(error?error.message:'Row added.'); viewAdmin(); };
+  $app.querySelectorAll('[data-row]').forEach(s=>s.onchange=async()=>{ if(S.preview) return previewOnly();
+    const { error } = await S.sb.from('volumes').update({ row_id:+s.value }).eq('id',s.dataset.row); toast(error ? error.message : 'Moved.'); });
+  $app.querySelectorAll('[data-tier]').forEach(s=>s.onchange=async()=>{ if(S.preview) return previewOnly();
+    s.disabled=true; try{ await setAccess(s.dataset.tier, s.value); toast('Access changed.'); }catch(e){ toast('It did not change: '+(e.message||e)); } viewAdmin(); });
+  $app.querySelectorAll('[data-cover]').forEach(inp=>inp.onchange=async()=>{
+    const f=inp.files[0]; if(!f) return; if(S.preview) return previewOnly();
+    try{ const url=await uploadCover(f); const { error } = await S.sb.from('volumes').update({ cover_url:url }).eq('id',inp.dataset.cover); if(error) throw error; toast('Cover updated.'); viewAdmin(); }
+    catch(e){ toast(e.message||'Cover upload failed.'); }
+  });
+  $app.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=async()=>{
+    if(S.preview) return previewOnly();
+    const v=items.find(x=>x.id===b.dataset.toggle);
+    const { error } = await S.sb.from('volumes').update({ status: v.status==='hidden'?'live':'hidden' }).eq('id',v.id);
+    if(error) return toast(error.message); toast(v.status==='hidden'?'It is back in the Library.':'It is hidden now.'); viewAdmin();
+  });
+  $app.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+    if(S.preview) return previewOnly();
+    const v=items.find(x=>x.id===b.dataset.del);
+    if(!confirm(`Delete "${v.title}"? This also deletes its file. It cannot be undone.`)) return;
+    const { data:f } = await S.sb.from('library_files').select('bucket,file_path').eq('volume_id',v.id).maybeSingle();
+    if(f?.file_path && f?.bucket) await S.sb.storage.from(f.bucket).remove([f.file_path]);
+    const { error } = await S.sb.from('volumes').delete().eq('id',v.id);
+    if(error) return toast(error.message); toast('Deleted.'); viewAdmin();
+  });
+}
+
+/* ============ ADMIN: MEMBERS ============ */
+let memFilter = { who:'all', show:'all' };
+async function viewMembers(){
+  renderNav('account');
+  if(!admin()){ location.hash='#/account'; return; }
+  $app.innerHTML = header()+adminTabs('members')+'<div class="empty">Loading members…</div>';
+  let rows=[];
+  if(S.preview){
+    const d=n=>new Date(Date.now()-n*864e5).toISOString();
+    rows=[{id:'1',email:'ruth@example.com',display_name:'Ruth',username:'hope_grows',role:'Member',joined:d(1),email_confirmed:true,opted_in:true,list_added_at:null},
+          {id:'2',email:'sam@example.com',display_name:'Sam',username:'sam_reads',role:'Member',joined:d(3),email_confirmed:true,opted_in:false,list_added_at:d(2)},
+          {id:'3',email:'grace@example.com',display_name:'Grace',username:null,role:'Admin',joined:d(5),email_confirmed:true,opted_in:true,list_added_at:null}];
+  } else {
+    const { data, error } = await S.sb.rpc('admin_members');
+    if(error){ $app.innerHTML = header()+adminTabs('members')+`<div class="card"><p>Members did not load: ${esc(error.message)}</p></div>`; return; }
+    rows=data||[];
+  }
+  const shown = rows.filter(r =>
+    (memFilter.who==='all' || (memFilter.who==='admin' ? r.role==='Admin' : memFilter.who==='partner' ? r.role==='Partner' : r.role==='Member')) &&
+    (memFilter.show==='all' || (memFilter.show==='optin' ? r.opted_in : !r.list_added_at)));
+  const count = f => rows.filter(f).length;
+  const sel = (k,v,l) => `<option value="${v}" ${memFilter[k]===v?'selected':''}>${l}</option>`;
+  $app.innerHTML = header()+adminTabs('members')+hero('Members','Everyone who has made an account.')+`
+  <div class="card"><div class="stats">
+    <div><b>${rows.length}</b><span class="meta">Members</span></div>
+    <div><b>${count(r=>r.opted_in)}</b><span class="meta">Want emails</span></div>
+    <div><b>${count(r=>!r.list_added_at)}</b><span class="meta">Not on list</span></div></div></div>
+  <div class="card">
+    <label for="fWho" style="margin-top:0">Who</label><select id="fWho">${sel('who','all','Everyone')}${sel('who','member','Members')}${CONFIG.PARTNER_ON?sel('who','partner','Partners'):''}${sel('who','admin','Admins')}</select>
+    <label for="fShow">Show</label><select id="fShow">${sel('show','all','All of them')}${sel('show','new','Not on my list yet')}${sel('show','optin','Only people who want emails')}</select>
+    <div class="row"><button class="btn" id="mCopy">Copy ${shown.length} emails</button><button class="btn outline" id="mCsv">Download list (CSV)</button><button class="btn outline" id="mMark">Mark ${shown.length} as on my list</button></div>
+    <p class="note" style="margin-top:10px">The list has name, username, email, role, join date, and email choice. It works with most email tools.</p>
+  </div>
+  <div class="card">${shown.length ? shown.map(r=>`<div class="adm-item"><div style="min-width:0">
+      <b>${esc(r.display_name||'—')}${r.username?` <span class="meta">@${esc(r.username)}</span>`:''}</b><span class="meta" style="display:block;word-break:break-all">${esc(r.email)}</span>
+      <span class="meta" style="display:block">${esc(r.role)} · joined ${when(r.joined)}${r.opted_in?' · wants emails':''}${r.email_confirmed?'':' · email not confirmed'}</span></div>
+      <div class="btns" style="flex-direction:column;align-items:flex-end">
+        <label class="optin" style="margin:0;font-size:14px"><input type="checkbox" data-added="${esc(r.id)}" ${r.list_added_at?'checked':''}> On list</label>
+        ${r.id===S.user?.id ? '<span class="meta">You</span>' : r.role==='Admin'
+          ? `<button class="btn quiet small" data-admin="${esc(r.id)}" data-on="0" data-name="${esc(r.display_name||r.email)}">Remove admin</button>`
+          : `<button class="btn outline small" data-admin="${esc(r.id)}" data-on="1" data-name="${esc(r.display_name||r.email)}">Make admin</button>`}
+        ${CONFIG.PARTNER_ON && r.role!=='Admin' ? `<button class="btn quiet small" data-partner="${esc(r.id)}" data-on="${r.role==='Partner'?0:1}">${r.role==='Partner'?'Remove partner':'Make partner'}</button>`:''}</div></div>`).join('')
+    : '<div class="empty">No one matches.</div>'}</div>${footer()}`;
+  document.getElementById('fWho').onchange=e=>{memFilter.who=e.target.value;viewMembers();};
+  document.getElementById('fShow').onchange=e=>{memFilter.show=e.target.value;viewMembers();};
+  document.getElementById('mCopy').onclick=()=>{ const list=shown.map(r=>r.email).join(', '); if(!list) return toast('No emails to copy.'); copyText(list, `Copied ${shown.length} emails.`); };
+  document.getElementById('mCsv').onclick=()=>{
+    const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+    const lines=[['Name','Username','Email','Role','Joined','Wants emails','On my list'].map(q).join(',')]
+      .concat(shown.map(r=>[r.display_name,r.username,r.email,r.role,(r.joined||'').slice(0,10),r.opted_in?'yes':'no',r.list_added_at?'yes':'no'].map(q).join(',')));
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));
+    a.download=`sprouted-grace-members-${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove();
+  };
+  const mark=async(ids,on)=>{ if(S.preview){ rows.filter(r=>ids.includes(r.id)).forEach(r=>r.list_added_at=on?new Date().toISOString():null); return toast('Preview mode: not saved.'); }
+    const { error } = await S.sb.rpc('admin_mark_added',{p_ids:ids,p_added:on}); if(error) toast(error.message); };
+  document.getElementById('mMark').onclick=async()=>{ if(!shown.length) return; await mark(shown.map(r=>r.id),true); toast(`Marked ${shown.length} as on your list.`); viewMembers(); };
+  $app.querySelectorAll('[data-added]').forEach(c=>c.onchange=()=>mark([c.dataset.added],c.checked));
+  $app.querySelectorAll('[data-admin]').forEach(b=>b.onclick=async()=>{
+    const on=b.dataset.on==='1', name=b.dataset.name;
+    if(!confirm(on ? `Make ${name} an admin? Admins can change the Library, remove posts, and see every member's email.` : `Remove admin from ${name}?`)) return;
+    if(S.preview) return toast('Preview mode: not saved.');
+    const { error } = await S.sb.rpc('admin_set_admin',{p_id:b.dataset.admin,p_on:on});
+    if(error) return toast(error.message); toast(on ? `${name} is now an admin.` : `${name} is no longer an admin.`); viewMembers();
+  });
+  $app.querySelectorAll('[data-partner]').forEach(b=>b.onclick=async()=>{
+    if(S.preview) return toast('Preview mode: not saved.');
+    const { error } = await S.sb.rpc('admin_set_partner',{p_id:b.dataset.partner,p_on:b.dataset.on==='1'}); if(error) return toast(error.message); toast('Saved.'); viewMembers();
+  });
+}
+
+/* ============ FELLOWSHIP ============ */
+const RULES = `<ul class="rules"><li>Be kind.</li><li>No threats or bullying.</li><li>No spam or selling.</li><li>Do not share other people's private information.</li></ul>
+  <p class="note" style="margin-top:6px">Posts that break these rules may be removed by the admin.</p>`;
+let roomSel = null;
+async function loadRooms(){ if(S.preview){ S.rooms=PREVIEW.rooms; return; } const { data } = await S.sb.from('forum_rooms').select('*').order('sort'); S.rooms=data||[]; }
+const prayerRoom = id => S.rooms.find(r=>r.id===id)?.kind==='prayer';
+async function prayedInfo(ids){
+  if(S.preview){ return { counts:Object.fromEntries(PREVIEW.threads.map(t=>[t.id,t.prayed+(S.demoPrayed[t.id]?1:0)])), mine:{...S.demoPrayed} }; }
+  if(!ids.length) return {counts:{},mine:{}};
+  const { data } = await S.sb.rpc('prayer_counts',{p_ids:ids});
+  const counts={}, mine={}; (data||[]).forEach(r=>{ counts[r.thread_id]=r.n; if(r.mine) mine[r.thread_id]=true; });
+  return {counts, mine};
+}
+async function togglePrayed(id, on){
+  if(S.preview){ if(on) S.demoPrayed[id]=true; else delete S.demoPrayed[id]; return true; }
+  const r = on ? await S.sb.from('prayers').insert({thread_id:id, user_id:S.user.id}) : await S.sb.from('prayers').delete().eq('thread_id',id).eq('user_id',S.user.id);
+  if(r.error){ toast(r.error.message); return false; } return true;
+}
+function prayBtn(id, n, mine){ return `<button class="pray ${mine?'on':''}" data-pray="${id}" data-mine="${mine?1:0}" aria-pressed="${!!mine}">🙏 ${mine?'You prayed':'Prayed for this'} · ${n||0}</button>`; }
+function bindPray(after){ $app.querySelectorAll('[data-pray]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const on=b.dataset.mine!=='1'; if(await togglePrayed(+b.dataset.pray,on)){ if(on) toast('Thank you for praying.'); after(); } }); }
+async function viewFellowship(newRoom){
+  renderNav('fellowship');
+  const top = hero('Fellowship','Share, pray, and learn with others. Be kind to one another.');
+  if(!signedIn()){ $app.innerHTML=header()+top+`<div class="card"><p>Fellowship has five rooms: Welcome, Prayer Requests, Testimonies, Bible Study, and General.</p></div>`+joinGate('Free account needed','Make a free account to read and post in Fellowship.')+footer(); return; }
+  $app.innerHTML=header()+'<div class="empty">Opening Fellowship…</div>';
+  await loadRooms();
+  if(newRoom==='prayer'){ roomSel = S.rooms.find(r=>r.kind==='prayer')?.id || roomSel; }
+  if(roomSel && !S.rooms.some(r=>r.id===roomSel)) roomSel=null;
+  let threads=[];
+  if(S.preview) threads=PREVIEW.threads.filter(t=>!roomSel||t.room_id===roomSel).map(t=>({...t,replies:t.posts.length}));
+  else {
+    let q=S.sb.from('forum_threads').select('id,title,created_at,room_id,author_id,anonymous,forum_posts(count)').order('created_at',{ascending:false}).limit(60);
+    if(roomSel) q=q.eq('room_id',roomSel);
+    const { data, error } = await q; if(error) toast('Posts did not load.');
+    threads=(data||[]).map(t=>({...t, replies:t.forum_posts?.[0]?.count ?? 0}));
+  }
+  await loadPeople(threads.map(t=>t.author_id));
+  const pr = await prayedInfo(threads.filter(t=>prayerRoom(t.room_id)).map(t=>t.id));
+  const roomName = id => S.rooms.find(r=>r.id===id)?.name || '';
+  const cur = S.rooms.find(r=>r.id===roomSel);
+  $app.innerHTML=header()+top+`
+  <div class="chips"><button class="chip ${!roomSel?'on':''}" data-c="">All rooms</button>${S.rooms.map(r=>`<button class="chip ${roomSel===r.id?'on':''}" data-c="${r.id}">${esc(r.name)}</button>`).join('')}</div>
+  <div class="row" style="margin:4px 0 14px"><button class="btn" id="newT">${cur?.kind==='prayer'?'Share a prayer request':'Start a conversation'}</button><button class="btn quiet small" id="rulesBtn">Posting rules</button></div>
+  <div id="rulesBox" class="card dash hidden"><h2 style="font-size:20px">Posting rules</h2>${RULES}</div>
+  <div id="newForm" class="card hidden"><h2>New post</h2>
+    <label for="tRoom">Room</label><select id="tRoom">${S.rooms.map(r=>`<option value="${r.id}" ${(roomSel||S.rooms[0]?.id)===r.id?'selected':''}>${esc(r.name)}</option>`).join('')}</select>
+    <label for="tTitle">Title</label><input id="tTitle" maxlength="140">
+    <label for="tBody">Message</label><textarea id="tBody" maxlength="5000"></textarea>
+    <label class="optin hidden" id="anonWrap"><input type="checkbox" id="tAnon"> Hide my name from other members. (The admin can still see it.)</label>
+    <div class="note" style="margin-top:12px">${RULES}</div>
+    <div class="row"><button class="btn" id="tPost">Post</button><button class="btn outline" id="tCancel">Cancel</button></div></div>
+  ${threads.map(t=>{const n=t.replies, a=S.people[t.author_id], isP=prayerRoom(t.room_id); return `<div class="thread" role="link" tabindex="0" data-t="${t.id}"><h3>${esc(t.title)}</h3>
+   <div class="meta">${t.anonymous?'A member (name hidden)':esc(a?.display_name||'A member')} · ${esc(roomName(t.room_id))} · ${when(t.created_at)} · ${n} ${n===1?'reply':'replies'}</div>
+   ${isP?`<div style="margin-top:10px">${prayBtn(t.id, pr.counts[t.id], pr.mine[t.id])}</div>`:''}</div>`}).join('')}
+  ${!threads.length?'<div class="empty">No posts yet. Be the first to say hello.</div>':''}${footer()}`;
+  $app.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{roomSel=b.dataset.c?+b.dataset.c:null;viewFellowship();});
+  $app.querySelectorAll('[data-t]').forEach(b=>{ const go=()=>location.hash='#/fellowship/'+b.dataset.t; b.onclick=go; b.onkeydown=e=>{ if(e.key==='Enter') go(); }; });
+  bindPray(()=>viewFellowship());
+  document.getElementById('rulesBtn').onclick=()=>document.getElementById('rulesBox').classList.toggle('hidden');
+  const f=document.getElementById('newForm'), roomIn=document.getElementById('tRoom');
+  const syncAnon=()=>document.getElementById('anonWrap').classList.toggle('hidden', !prayerRoom(+roomIn.value));
+  roomIn.onchange=syncAnon; syncAnon();
+  const openForm=()=>{ f.classList.remove('hidden'); document.getElementById('tTitle').focus(); };
+  document.getElementById('newT').onclick=openForm;
+  document.getElementById('tCancel').onclick=()=>f.classList.add('hidden');
+  if(newRoom) openForm();
+  document.getElementById('tPost').onclick=async()=>{
+    const title=document.getElementById('tTitle').value.trim(), body=document.getElementById('tBody').value.trim(), room=+roomIn.value;
+    const anon = prayerRoom(room) && document.getElementById('tAnon').checked;
+    if(!title||!body) return toast('Please add a title and a message.');
+    if(S.preview){ PREVIEW.threads.unshift({id:Date.now(),room_id:room,author_id:anon?null:'me',secret:anon?'me':null,anonymous:anon,title,body,created_at:new Date().toISOString(),prayed:0,posts:[]}); toast('Preview: posted.'); location.hash='#/fellowship'; return viewFellowship(); }
+    const { error } = await S.sb.rpc('create_thread',{p_room:room,p_title:title,p_body:body,p_anon:anon});
+    if(error) return toast('That did not post: '+error.message);
+    toast('Posted.'); if(location.hash!=='#/fellowship') location.hash='#/fellowship'; else viewFellowship();
+  };
+}
+async function viewThread(id){
+  renderNav('fellowship');
+  if(!signedIn()) return viewFellowship();
+  if(!S.rooms.length) await loadRooms();
+  let t, posts, secret=null;
+  if(S.preview){ t=PREVIEW.threads.find(x=>x.id===+id); posts=t?.posts||[]; secret=t?.secret||null; }
+  else {
+    t=(await S.sb.from('forum_threads').select('id,title,body,created_at,author_id,anonymous,room_id').eq('id',id).maybeSingle()).data;
+    posts=(await S.sb.from('forum_posts').select('id,body,created_at,author_id').eq('thread_id',id).order('created_at')).data||[];
+    if(t?.anonymous && admin()){ const { data } = await S.sb.from('thread_secret_authors').select('author_id').eq('thread_id',id).maybeSingle(); secret=data?.author_id||null; }
+  }
+  if(!t){ $app.innerHTML=header()+`<div class="reader-head"><button class="back" onclick="location.hash='#/fellowship'">‹ Fellowship</button></div><div class="empty">This post was removed.</div>`; return; }
+  await loadPeople([t.author_id, secret, ...posts.map(p=>p.author_id)]);
+  const isP = prayerRoom(t.room_id);
+  const pr = isP ? await prayedInfo([t.id]) : null;
+  const mineT = t.author_id===myId() || (secret && secret===myId());
+  const canDel = a => admin() || a===myId();
+  $app.innerHTML=header()+`<div class="reader-head"><button class="back" onclick="location.hash='#/fellowship'">‹ Fellowship</button><span class="counter">${esc(S.rooms.find(r=>r.id===t.room_id)?.name||'')}</span></div>
+  <div class="card"><h2>${esc(t.title)}</h2>
+   <div class="post" style="border-top:0">${t.anonymous?whoLink(null):whoLink(S.people[t.author_id])}
+     ${t.anonymous&&admin()?`<p class="hidden-name" style="margin-top:6px">Only admins see this: posted by ${esc(S.people[secret]?.display_name||'unknown')}${S.people[secret]?.username?' (@'+esc(S.people[secret].username)+')':''}</p>`:''}
+     <div class="meta" style="margin-top:6px">${when(t.created_at)}</div><div class="txt">${esc(t.body)}</div>
+     <div class="row" style="margin-top:12px">${isP?prayBtn(t.id, pr.counts[t.id], pr.mine[t.id]):''}${(admin()||mineT)?`<button class="btn quiet small" id="delT">${admin()&&!mineT?'Remove post':'Delete my post'}</button>`:''}</div></div>
+   ${posts.map(p=>`<div class="post">${whoLink(S.people[p.author_id],32)}<div class="meta" style="margin-top:6px">${when(p.created_at)}</div><div class="txt">${esc(p.body)}</div>
+     ${canDel(p.author_id)?`<div class="row" style="margin-top:8px"><button class="btn quiet small" data-delp="${p.id}">${admin()&&p.author_id!==myId()?'Remove reply':'Delete'}</button></div>`:''}</div>`).join('')||'<div class="empty">No replies yet.</div>'}</div>
+  <div class="card"><label for="rBody" style="margin-top:0">${isP?'Send a kind word or a short prayer':'Your reply'}</label><textarea id="rBody" maxlength="5000"></textarea>
+    <div class="row"><button class="btn" id="rPost">Reply</button></div><p class="note" style="margin-top:10px">Be kind. No threats, spam, or private information.</p></div>${footer()}`;
+  bindPray(()=>viewThread(id));
+  document.getElementById('rPost').onclick=async()=>{
+    const body=document.getElementById('rBody').value.trim(); if(!body) return;
+    if(S.preview){ t.posts.push({id:Date.now(),author_id:'me',body,created_at:new Date().toISOString()}); return viewThread(id); }
+    const { error } = await S.sb.from('forum_posts').insert({thread_id:+id,body,author_id:S.user.id});
+    if(error) return toast('That did not post: '+error.message); viewThread(id);
+  };
+  const dt=document.getElementById('delT'); if(dt) dt.onclick=async()=>{ if(!confirm('Remove this post and its replies?')) return;
+    if(S.preview){ PREVIEW.threads=PREVIEW.threads.filter(x=>x.id!==t.id); location.hash='#/fellowship'; return; }
+    const { error } = await S.sb.from('forum_threads').delete().eq('id',t.id); if(error) return toast(error.message); toast('Removed.'); location.hash='#/fellowship'; };
+  $app.querySelectorAll('[data-delp]').forEach(b=>b.onclick=async()=>{ if(!confirm('Remove this reply?')) return;
+    if(S.preview){ t.posts=t.posts.filter(p=>p.id!==+b.dataset.delp); return viewThread(id); }
+    const { error } = await S.sb.from('forum_posts').delete().eq('id',+b.dataset.delp); if(error) return toast(error.message); toast('Removed.'); viewThread(id); });
+}
+
+/* ============ PUBLIC PROFILE ============ */
+async function viewProfile(key){
+  renderNav('fellowship');
+  if(!signedIn()){ $app.innerHTML=header()+joinGate('Free account needed','Make a free account to see member profiles.')+footer(); return; }
+  let p=null;
+  if(S.preview){ p=Object.values(PREVIEW.people).find(x=>x.username===key||x.id===key) || (key===S.profile?.username||key==='me'?{...S.profile,id:'me'}:null); }
+  else {
+    const byId = /^[0-9a-f-]{36}$/i.test(key);
+    const { data } = byId ? await S.sb.from('public_profiles').select('*').eq('id',key).maybeSingle()
+                          : await S.sb.from('public_profiles').select('*').ilike('username',key.replace(/[%_\\]/g,'\\$&')).maybeSingle();
+    p=data;
+  }
+  if(!p){ $app.innerHTML=header()+'<div class="empty">We could not find that member.</div>'; return; }
+  const mine = p.id===myId();
+  $app.innerHTML=header()+`<div class="reader-head"><button class="back" onclick="history.length>1?history.back():location.hash='#/fellowship'">‹ Back</button></div>
+  <div class="profile-hero"><div class="band"></div><div class="inner">
+    ${avatar(p,88)}
+    <h1>${esc(p.display_name||p.username)}</h1>
+    ${p.username?`<div class="meta">@${esc(p.username)}</div>`:''}
+    ${p.bio?`<p class="bio">${esc(p.bio)}</p>`:'<p class="note" style="margin-top:10px">No bio yet.</p>'}
+    ${p.created_at?`<p class="meta" style="margin-top:12px">Member since ${longDate(p.created_at)}</p>`:''}
+  </div></div>
+  ${mine?'<div class="row"><a class="btn outline" href="#/account">Edit my profile</a></div>':''}${footer()}`;
+}
+
+/* ============ ACCOUNT ============ */
+async function resizeImage(file, size=320){
+  const src=URL.createObjectURL(file);
+  try{
+    const img = await new Promise((ok,bad)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=()=>bad(new Error('That image did not open. Try a JPG or PNG.')); i.src=src; });
+    const s=Math.min(img.width,img.height), c=document.createElement('canvas'); c.width=c.height=size;
+    c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,size,size);
+    return await new Promise(ok=>c.toBlob(ok,'image/jpeg',0.86));
+  } finally { URL.revokeObjectURL(src); }
+}
+function profilePanel(){
+  const p=S.profile||{}, lim=CONFIG.BIO_LIMIT;
+  return `<div class="eyebrow">Your profile</div><div class="card">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      ${avatar(p,84)}
+      <div class="row" style="margin:0"><label class="btn outline small" style="margin:0">Upload photo<input type="file" id="pPhoto" accept="image/*" class="hidden"></label>
+      ${p.avatar_url?'<button class="btn quiet small" id="pPhotoRm">Remove</button>':''}</div></div>
+    <label for="pName">Display name</label><input id="pName" maxlength="40" value="${esc(p.display_name||'')}">
+    <label for="pUser">Username (you can sign in with it too)</label><input id="pUser" maxlength="20" value="${esc(p.username||'')}" placeholder="letters, numbers, or _" autocapitalize="none" autocomplete="username">
+    <label for="pBio">Short bio</label><textarea id="pBio" maxlength="${lim}" style="min-height:90px" placeholder="A line or two about you.">${esc(p.bio||'')}</textarea>
+    <div class="count" id="pCount">${(p.bio||'').length} / ${lim}</div>
+    <div class="row"><button class="btn" id="pSave">Save profile</button><a class="btn outline" href="#/u/${esc(p.username||myId()||'')}">See my profile</a></div></div>`;
+}
+function bindProfile(){
+  const bio=document.getElementById('pBio'); if(!bio) return;
+  bio.oninput=()=>document.getElementById('pCount').textContent=`${bio.value.length} / ${CONFIG.BIO_LIMIT}`;
+  const save = async (extra={})=>{
+    const p=S.profile||{};
+    const args={ p_display_name: document.getElementById('pName').value.trim(), p_username: document.getElementById('pUser').value.trim()||null,
+      p_bio: bio.value.trim()||null, p_avatar_url: ('avatar' in extra)?extra.avatar:(p.avatar_url||null) };
+    if(!args.p_display_name){ toast('Please add a display name.'); return false; }
+    if(args.p_username && !/^[A-Za-z0-9_]{3,20}$/.test(args.p_username)) { toast('Usernames are 3 to 20 letters, numbers, or _.'); return false; }
+    if(S.preview){ Object.assign(S.profile,{display_name:args.p_display_name,username:args.p_username,bio:args.p_bio}); toast('Preview: profile saved.'); viewAccount(); return true; }
+    const { error } = await S.sb.rpc('update_my_profile', args);
+    if(error){ toast(error.message); return false; }
+    await loadProfile(); toast('Profile saved.'); viewAccount(); return true;
+  };
+  document.getElementById('pSave').onclick=()=>save();
+  const ph=document.getElementById('pPhoto');
+  ph.onchange=async()=>{ const f=ph.files[0]; if(!f) return;
+    if(S.preview) return previewOnly();
+    try{ const blob=await resizeImage(f); const path=`${S.user.id}/${Date.now()}.jpg`;
+      const { error } = await S.sb.storage.from('avatars').upload(path, blob, { contentType:'image/jpeg', upsert:false }); if(error) throw error;
+      const url=S.sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      const old=S.profile?.avatar_url;
+      if(await save({avatar:url})){ if(old && old.includes('/avatars/')){ const op=old.split('/avatars/')[1]; if(op) S.sb.storage.from('avatars').remove([op]); } }
+      else S.sb.storage.from('avatars').remove([path]);
+    }catch(e){ toast(e.message||'Photo upload failed.'); } };
+  const rm=document.getElementById('pPhotoRm'); if(rm) rm.onclick=async()=>{
+    const old=S.profile?.avatar_url;
+    if(await save({avatar:null}) && !S.preview && old && old.includes('/avatars/')){ const op=old.split('/avatars/')[1]; if(op) S.sb.storage.from('avatars').remove([op]); } };
+}
+function prefsPanel(){
+  const big=document.documentElement.classList.contains('big'), night=!!bstate().night;
+  const opt = !!S.profile?.marketing_opt_in;
+  return `${signedIn()&&!S.preview?`<div class="card"><h2>Email updates</h2><p>${opt?'We email you when new lessons and live times are posted.':'Get an email when new lessons and live times are posted.'}</p>
+    <div class="row"><button class="btn outline" id="optBtn" aria-pressed="${opt}">${opt?'Stop emails':'Yes, email me'}</button></div></div>`:''}
+  <div class="card"><h2>Text size</h2><p>Make the text larger across the app.</p>
+    <div class="row"><button class="btn outline" id="bigText" aria-pressed="${big}">${big?'Use standard text':'Use larger text'}</button><button class="btn quiet" id="nightBtn" aria-pressed="${night}">${night?'Light mode':'Night mode'}</button></div></div>`;
+}
+function bindPrefs(){
+  const o=document.getElementById('optBtn');
+  if(o) o.onclick=async()=>{ const on=!S.profile?.marketing_opt_in; const { error } = await S.sb.rpc('set_my_opt_in',{p_on:on});
+    if(error) return toast(error.message); S.profile.marketing_opt_in=on; toast(on?'You are on the email list.':'Emails stopped.'); viewAccount(); };
+  const b=document.getElementById('bigText'); if(b) b.onclick=()=>{ const on=!document.documentElement.classList.contains('big'); document.documentElement.classList.toggle('big',on); store('sg.bigtext',on); viewAccount(); };
+  const n=document.getElementById('nightBtn'); if(n) n.onclick=()=>{ const s=bstate(); s.night=!s.night; bsave(s); applyLook(); viewAccount(); };
+}
+let authTab='up';
+function viewReset(){
+  renderNav('account');
+  $app.innerHTML=header()+`<div class="reader-head"><button class="back" onclick="location.hash='#/account'">‹ Back</button></div>`+hero('Reset your password','Type the email you signed up with. We will send you a link.')+`<div class="card">
+    <label for="rEmail" style="margin-top:0">Email</label><input id="rEmail" type="email" autocomplete="email">
+    <div class="row"><button class="btn" id="rGo">Send reset link</button></div>
+    <p class="note" style="margin-top:12px">Open the link on this same phone or computer. Then type a new password. Do not see the email? Check your spam folder.</p></div>${footer()}`;
+  document.getElementById('rGo').onclick=async()=>{
+    const email=document.getElementById('rEmail').value.trim(); if(!email.includes('@')) return toast('Please type your email address.');
+    if(S.preview) return toast('Preview mode: this works on the live app.');
+    const b=document.getElementById('rGo'); b.disabled=true;
+    const { error } = await S.sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/'});
+    b.disabled=false; toast(error?error.message:'Check your email for a link to reset your password.');
+  };
+}
+function passwordCard(){
+  return `<div class="card"><h2>Change password</h2><label for="cp1" style="margin-top:0">New password (8 or more characters)</label><input id="cp1" type="password" autocomplete="new-password">
+    <label for="cp2">Type it again</label><input id="cp2" type="password" autocomplete="new-password">
+    <div class="row"><button class="btn outline" id="cpGo">Save new password</button></div></div>`;
+}
+function bindPassword(){
+  const b=document.getElementById('cpGo'); if(!b) return;
+  b.onclick=async()=>{ const a=document.getElementById('cp1').value, c=document.getElementById('cp2').value;
+    if(a.length<8) return toast('Use 8 or more characters.'); if(a!==c) return toast('The two passwords do not match.');
+    if(S.preview) return toast('Preview mode: this works on the live app.');
+    const { error } = await S.sb.auth.updateUser({password:a}); if(error) return toast(error.message); toast('Your new password is saved.'); viewAccount(); };
+}
+function viewAccount(){
+  renderNav('account');
+  if(S.recovery && !S.preview){
+    $app.innerHTML=header()+hero('Set a new password','Type a new password. Use 8 or more characters.')+`<div class="card">
+      <label for="np" style="margin-top:0">New password</label><input id="np" type="password" autocomplete="new-password" minlength="8">
+      <div class="row"><button class="btn" id="npGo">Save new password</button></div></div>${footer()}`;
+    document.getElementById('npGo').onclick=async()=>{ const pw=document.getElementById('np').value; if(pw.length<8) return toast('Use 8 or more characters.');
+      const { error } = await S.sb.auth.updateUser({password:pw}); if(error) return toast(error.message); S.recovery=false; toast('Your password is saved.'); viewAccount(); };
+    return;
+  }
+  if(!signedIn()){
+    $app.innerHTML=header()+hero('Your Account','Make a free account, or sign in.')+`
+    <div class="card"><div class="tabs" role="tablist"><button class="${authTab==='up'?'on':''}" data-tab="up" role="tab" aria-selected="${authTab==='up'}">Make account</button><button class="${authTab==='in'?'on':''}" data-tab="in" role="tab" aria-selected="${authTab==='in'}">Sign in</button></div>
+     ${authTab==='up'?`<label for="aUser">Username</label><input id="aUser" maxlength="20" autocapitalize="none" autocomplete="username" placeholder="3 to 20 letters, numbers, or _">
+       <label for="aName">Display name</label><input id="aName" maxlength="40" autocomplete="name" placeholder="What should we call you?">
+       <label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email">`
+     :`<label for="aEmail">Email or username</label><input id="aEmail" autocapitalize="none" autocomplete="username">`}
+     <label for="aPass">Password (8 or more characters)</label><input id="aPass" type="password" autocomplete="${authTab==='up'?'new-password':'current-password'}" minlength="8">
+     ${authTab==='up'?`<label class="optin" for="aOpt"><input type="checkbox" id="aOpt"> Email me when new lessons and live times are posted. I can stop any time.</label>
+     <p class="note" style="margin-top:10px">When you make an account, you agree to our <a href="${esc(legalHref('terms'))}">Terms</a> and <a href="${esc(legalHref('privacy'))}">Privacy Policy</a>. We will email you a link. Tap it to finish.</p>`:''}
+     <div class="row"><button class="btn" id="aGo">${authTab==='up'?'Make Free Account':'Sign In'}</button></div>
+     <p style="margin-top:14px"><a href="#/reset">Forgot your password?</a></p></div>
+    <div class="card"><h2>What a free account opens</h2><ul class="ticks"><li>Every “Free account” lesson in the Library</li><li>Fellowship: post, reply, and pray with others</li><li>Back up your highlights, bookmarks, and notes</li></ul></div>
+    ${prefsPanel()}${footer()}`;
+    bindPrefs();
+    $app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{authTab=b.dataset.tab;viewAccount();});
+    document.getElementById('aGo').onclick=doAuth;
+    return;
+  }
+  $app.innerHTML=header()+`<div class="hero" style="display:flex;align-items:center;gap:14px">${avatar(S.profile,56)}<div><h1 style="font-size:26px">${esc(myName())}</h1><p>${admin()?'Admin':'Member'}${S.profile?.username?` · @${esc(S.profile.username)}`:''}</p></div></div>
+  ${admin()?`<div class="card gilt"><h2>Admin tools</h2><p>You help run Sprouted Grace.</p>
+    <div class="row"><a class="btn" href="#/admin">Library manager</a><a class="btn outline" href="#/admin/members">Members</a><a class="btn outline" href="#/home">Post a live time</a></div>
+    <p class="note" style="margin-top:10px">You can remove any Fellowship post that breaks the rules. Open the post and tap “Remove post.”</p></div>`:''}
+  ${profilePanel()}
+  ${prefsPanel()}
+  ${passwordCard()}
+  <div class="card"><h2>Your Bible notes</h2><p>Back up your highlights, bookmarks, notes, and plans to this account.</p><div class="row"><a class="btn outline" href="#/bible/saved">Open Saved</a></div></div>
+  ${S.preview?`<div class="card dash"><h2>Preview controls</h2><p>Try the app as each kind of person.</p><div class="row"><button class="btn outline small" id="demoAdmin">${S.demoAdmin?'Stop being admin':'Be admin'}</button></div></div>`:''}
+  <div class="row"><button class="btn outline" id="out">Sign Out</button></div>${footer()}`;
+  bindPrefs(); bindProfile(); bindPassword();
+  const da=document.getElementById('demoAdmin'); if(da) da.onclick=()=>{S.demoAdmin=!S.demoAdmin;viewAccount();};
+  document.getElementById('out').onclick=async()=>{ if(S.preview){S.demoUser=false;S.demoAdmin=false;} else await S.sb.auth.signOut(); location.hash='#/home'; };
+}
+async function doAuth(){
+  const id=document.getElementById('aEmail').value.trim(), pass=document.getElementById('aPass').value;
+  if(!id||pass.length<8) return toast('Fill in each box. Use a password with 8 or more characters.');
+  if(S.preview){ S.demoUser=true; toast('Preview: you are signed in.'); return viewAccount(); }
+  const btn=document.getElementById('aGo'); btn.disabled=true;
+  try{
+    if(authTab==='up'){
+      const username=document.getElementById('aUser').value.trim();
+      if(!/^[A-Za-z0-9_]{3,20}$/.test(username)) return toast('Usernames are 3 to 20 letters, numbers, or _.');
+      if(!id.includes('@')) return toast('Please type a real email address.');
+      const { data:free } = await S.sb.rpc('username_available',{p_username:username});
+      if(free===false) return toast('That username is taken. Please try another.');
+      const name=(document.getElementById('aName').value.trim()||username).slice(0,40);
+      const { data, error } = await S.sb.auth.signUp({email:id,password:pass,options:{data:{display_name:name, username, marketing_opt_in: !!document.getElementById('aOpt')?.checked},emailRedirectTo:location.origin}});
+      if(error) return toast(error.message);
+      if(!data.session) return toast('Almost done. Check your email and tap the link.');
+    } else {
+      let email=id;
+      if(!id.includes('@')){
+        const { data, error } = await S.sb.rpc('login_email',{p_username:id,p_password:pass});
+        if(error) return toast(error.message);
+        if(!data) return toast('That username and password do not match.');
+        email=data;
+      }
+      const { error } = await S.sb.auth.signInWithPassword({email,password:pass});
+      if(error) return toast(error.message==='Invalid login credentials'?'That sign-in and password do not match.':error.message);
+    }
+  } finally { if(document.body.contains(btn)) btn.disabled=false; }
+}
+
+/* ============ LEGAL PAGES (built in) ============ */
+const LEGAL_UPDATED = 'November 16, 2026';
+const WHO = () => esc(CONFIG.COPYRIGHT_HOLDER);
+const MAIL = () => `<a href="mailto:${esc(CONFIG.ADMIN_EMAIL)}">${esc(CONFIG.ADMIN_EMAIL)}</a>`;
+const LEGAL_PAGES = {
+  terms: ['Terms of Use', () => `
+    <p>These terms are for the Sprouted Grace Ministry app. The app is run by ${WHO()} ("we" and "us"). When you use the app or make an account, you agree to these terms.</p>
+    <h2>Your account</h2><ul><li>You must be 13 or older to make an account. If you are under 18, ask a parent first.</li><li>Keep your password private.</li><li>Your name and photo must not pretend to be someone else.</li></ul>
+    <h2>Fellowship rules</h2><ul><li>Be kind.</li><li>No threats, bullying, or harassment.</li><li>No spam or selling.</li><li>Do not share other people's private information.</li></ul>
+    <p>The admin may remove posts that break these rules. Your posts stay yours. You let us show them in the app.</p>
+    <h2>Gifts</h2><ul><li>Gifts are given freely to support the ministry.</li><li><strong>Gifts are not refunded.</strong></li><li>Card gifts go through Stripe. Bitcoin gifts cannot be undone.</li></ul>
+    <h2>Our lessons</h2><p>The lessons, files, and designs in the Library belong to us. They are for your own use. Please do not sell them. The King James Version and the World English Bible are in the public domain.</p>
+    <h2>Not professional advice</h2><p>This app shares the Bible and faith teaching. It is not medical, legal, or money advice. If you are in danger, call 911. In the US, you can call or text 988 any time.</p>
+    <h2>No promises</h2><p>We work to keep the app running. We cannot promise it will always work or have no mistakes.</p>
+    <h2>Changes</h2><p>We may update these terms. When we do, we will change the date at the top. Questions? Email ${MAIL()}.</p>`],
+  privacy: ['Privacy Policy', () => `
+    <p>We keep as little about you as we can. We never sell it.</p>
+    <h2>What we keep</h2><ul>
+      <li><strong>Your account:</strong> your email, username, display name, and password. Supabase stores them safely. We cannot see your password.</li>
+      <li><strong>Your profile:</strong> your photo and short bio. Other members can see these. They cannot see your email.</li>
+      <li><strong>Fellowship:</strong> what you post and when you tap “Prayed for this.” If you hide your name on a prayer request, other members do not see it. The admin can.</li>
+      <li><strong>Backups:</strong> if you tap “Back up now,” we save your highlights, bookmarks, notes, and plan check-offs to your account.</li>
+      <li><strong>Email updates:</strong> only if you say yes. You can stop them on your Account page.</li></ul>
+    <h2>What stays on your phone</h2><p>Your highlights, bookmarks, notes, reading plans, and settings stay on your device unless you back them up.</p>
+    <h2>Gifts</h2><p>Stripe handles card gifts. We never see your card number. Bitcoin gifts go straight to our wallet.</p>
+    <h2>What we don't do</h2><p>No ads. No tracking. We never sell or rent your information.</p>
+    <h2>Other services</h2><p>Lessons may play videos from YouTube or Vimeo. Live services are on TikTok. Each has its own privacy policy.</p>
+    <h2>Your choices</h2><p>To see, fix, or delete your information, email ${MAIL()}. We do not knowingly collect information from children under 13.</p>`],
+  accessibility: ['Accessibility', () => `
+    <p>We want everyone to be able to use this app, including people who use screen readers, keyboards, or zoom. We aim to meet the WCAG 2.1 AA guidelines.</p>
+    <h2>What is built in</h2><ul>
+      <li>A <strong>larger text</strong> option on the Account page, and a text-size slider in the Bible.</li>
+      <li>A <strong>night mode</strong> with a dark background.</li>
+      <li>Labels on buttons and boxes for screen readers.</li>
+      <li>A “Skip to content” link and full keyboard use.</li>
+      <li>Animations stop if your device is set to reduce motion.</li>
+      <li>An <strong>Open PDF</strong> button on every lesson, so your device can read it aloud.</li></ul>
+    <h2>Need help?</h2><p>If anything is hard to use, email ${MAIL()}. We will reply within a few days.</p>`]
+};
+function viewLegal(k){
+  renderNav('account');
+  const p = LEGAL_PAGES[k]; if(!p){ location.hash='#/account'; return; }
+  $app.innerHTML=header()+`<div class="reader-head"><button class="back" onclick="history.length>1?history.back():location.hash='#/account'">‹ Back</button></div>
+  ${hero(esc(p[0]),'Last updated '+LEGAL_UPDATED)}<div class="card legal">${p[1]()}</div>${footer()}`;
+}
+
+/* ============ ROUTER ============ */
+async function route(keepScroll){
+  closeSheet();
+  const y=window.scrollY;
+  if(keepScroll!==true) window.scrollTo(0,0);
+  const parts=(location.hash||'#/home').slice(2).split('/');
+  const n = i => parts[i]===undefined||parts[i]==='' ? undefined : +parts[i];
+  try{
+    if(parts[0]==='bible'){
+      if(parts[1]==='read') await viewRead(parts[2], n(3), n(4), n(5));
+      else if(parts[1]==='pick') await viewPick(n(2), n(3));
+      else if(parts[1]==='search') await viewSearch();
+      else if(parts[1]==='red') await viewRed(n(2), n(3));
+      else if(parts[1]==='plans') viewPlans(parts[2]);
+      else if(parts[1]==='saved') await viewSaved();
+      else { const s=bstate(); await viewRead(s.pos.tr, s.pos.b, s.pos.c); }
+    }
+    else if(parts[0]==='library') await viewLibrary();
+    else if(parts[0]==='item') await viewItem(decodeURIComponent(parts[1]));
+    else if(parts[0]==='fellowship') parts[1]==='new' ? await viewFellowship(parts[2]||'any') : parts[1] ? await viewThread(parts[1]) : await viewFellowship();
+    else if(parts[0]==='u') await viewProfile(decodeURIComponent(parts[1]||''));
+    else if(parts[0]==='admin') parts[1]==='members' ? await viewMembers() : await viewAdmin();
+    else if(parts[0]==='give') viewGive();
+    else if(parts[0]==='legal') viewLegal(parts[1]);
+    else if(parts[0]==='account') viewAccount();
+    else if(parts[0]==='reset') viewReset();
+    else await viewHome();
+    if(keepScroll===true) window.scrollTo(0,y);
+  }catch(e){ console.error(e); $app.innerHTML=header()+'<div class="empty">Something went wrong. Please refresh.</div>'+footer(); }
+}
+
+/* ============ START ============ */
+(async function init(){
+  if(store('sg.bigtext')) document.documentElement.classList.add('big');
+  applyLook();
+  new MutationObserver(()=>{
+    if(!$app.querySelector('.foot')) $app.insertAdjacentHTML('beforeend', footer());
+  }).observe($app,{childList:true});
+  S.preview = CONFIG.SUPABASE_URL.includes('YOUR-') || !window.supabase;
+  if(!S.preview){
+    S.sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    const { data } = await S.sb.auth.getSession(); S.user = data.session?.user || null;
+    await loadProfile();
+    S.sb.auth.onAuthStateChange(async (event, session)=>{
+      if(event==='PASSWORD_RECOVERY'){ S.recovery=true; S.user=session?.user||null; location.hash='#/account'; return viewAccount(); }
+      const was=S.user?.id; S.user=session?.user||null;
+      if(was!==S.user?.id){ await loadProfile(); S.people={}; await route(); }
+    });
+  } else { await loadProfile(); }
+  window.addEventListener('hashchange', ()=>route());
+  await route();
+  if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
