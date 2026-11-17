@@ -1,6 +1,6 @@
 // Sprouted Grace service worker. It keeps the app and the Bible on the phone so they open fast and work offline.
 // Change VERSION whenever you change index.html, so phones get the update.
-const VERSION = 'sproutedgrace-v2';
+const VERSION = 'sproutedgrace-v3';
 const BIBLE = 'sproutedgrace-bible-v1';   // Bible files never change, so they keep their own cache
 const SHELL = ['/', '/index.html', '/manifest.json', '/logo.png', '/hero.jpg', '/favicon.png', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png', '/qrcode.js',
   '/fonts/EBGaramond-Regular.woff', '/fonts/EBGaramond-SemiBold.woff', '/fonts/EBGaramond-Italic.woff',
