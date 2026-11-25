@@ -13,7 +13,14 @@ This is one web page that works like a phone app. GitHub Pages shows it to the w
 | `index.html` | The whole app. Your settings are at the top, in `CONFIG`. |
 | `sw.js` | Lets the app open fast and work offline. |
 | `manifest.json` | Lets people add the app to their home screen. |
-| `bible/kjv/` and `bible/web/` | The King James Version and the World English Bible. One file per book (1 = Genesis, 66 = Revelation). The words of Jesus are inside `{ }` so the app can show them in red. |
+| `bible/kjv/`, `gnv/`, `bsb/` | The three Bible versions in the app (KJV, Geneva 1599, Berean Standard). Other versions open on BibleGateway. One file per book (1 = Genesis, 66 = Revelation). The words of Jesus are inside `{ }` so the app can show them in red. |
+| `bible/study/` | Word study: Hebrew and Greek word by word (1–66), Strong's dictionary (`lex-H`, `lex-G`), and the concordance (`conc-H`, `conc-G`). |
+| `bible/extra/` | 1 Enoch (67), 1 Maccabees (68), 2 Maccabees (69). |
+| `guide/redletters.json` | The Red Letters guide: a context note for every chapter where Jesus speaks, plus notes on easy-to-misread verses. (`.txt` files are the same notes, easy to edit.) |
+| `seeds/seeds.js` | The Seven Seeds screens. The guide's words live in Supabase, so only people who own it can read them. |
+| `supabase-update-covenant-seeds.sql` | Run once: Covenant Membership, the Covenant Circle room, and The Seven Seeds. |
+| `games/` | The Fun Room: `games.js` (all nine games) and `words.txt` (the word list for Word Builder). |
+| `supabase-update-fun-room.sql` | Run once in Supabase to turn on online game tables. |
 | `fonts/` | The Bible font (EB Garamond). |
 | `qrcode.js` | Draws the Bitcoin QR code on the Give page. |
 | `logo.png`, `favicon.png`, `apple-touch-icon.png`, `icon-*.png` | Logo and app icons. |
@@ -100,6 +107,11 @@ It can take a few minutes to a few hours. Then go back to **Settings → Pages**
 
 ---
 
+## Covenant Members and The Seven Seeds
+
+- **Covenant Members:** people apply in the app (Account → Covenant Membership). You approve them in Account → Admin tools → Applications. Edit the Member Covenant and your Statement of Faith link in `CONFIG` (`COVENANT`, `STATEMENT_URL`).
+- **The Seven Seeds:** put your Stripe link in `SEEDS_STRIPE_URL` (and the price in `SEEDS_PRICE`). In Stripe, set the payment link's "after payment" page to `https://app.sproutedgrace.net/#/seeds?paid`. When someone buys, make a code in Admin tools → Seven Seeds codes and email it to them. Or check "Seven Seeds" next to their name in Members.
+
 ## Changing the logo
 
 The app already uses the official logo (the sprout coming out of the gold box). To change it later:
@@ -117,6 +129,23 @@ Open `sw.js` and change `VERSION` (for example `sproutedgrace-v1` → `sproutedg
 
 ## Where things come from
 
-- **Bible text:** the King James Version and the World English Bible, both in the public domain. Taken from the open-bibles collection (github.com/seven1m/open-bibles), which marks the words of Jesus.
+- **Bible text:** all public domain. KJV and WEB come from the open-bibles collection (github.com/seven1m/open-bibles), which marks the words of Jesus. BSB, Bible in Basic English, Geneva 1599, Young's Literal, and Darby come from eBible.org (github.com/BibleNLP/ebible). Their red letters were matched from the KJV verse by verse, so a few verses where Jesus speaks partway through stay black.
+- **Other books:** 1 Enoch is the R. H. Charles translation (1917), from github.com/scrollmapper/bible_databases_deuterocanonical. 1 and 2 Maccabees are the KJV Apocrypha text from eBible.org.
+- **Word study:** Hebrew and Greek word data from STEPBible.org (TAHOT and TAGNT, CC BY 4.0 — free to use with credit). Strong's dictionary by James Strong (1890, public domain), Open Scriptures edition (CC BY-SA). The app shows this credit on every study page.
+- **Fun Room:** all games, names, boards, card text, and art are original to this app. The Word Builder word list is ENABLE (public domain), with crude words removed.
 - **Font:** EB Garamond, SIL Open Font License (`fonts/OFL.txt`).
 - **QR codes:** qrcode-generator by Kazuhiko Arase, MIT License (notice at the top of `qrcode.js`).
+
+## Daily Walk (added Nov 23, 2026)
+A daily devotional checklist at `#/walk`, with a card at the top of Home.
+- **Morning:** 1) Read today's Red Letters chapters (buttons open the Bible reader, with a "Back to Daily Walk" button) and write one line that stood out. 2) Pray: thanks, needs, who I'm praying for. 3) Be still: a timer (15 min by default) with a soft chime at the start and end. 4) Journal: gratitude, what is true about me, today's win.
+- **Evening:** 5) A Psalm or Proverb, give thanks, pray for rest.
+- **Extras:** a streak counter, a daily calendar reminder (.ics), and a Saturday LIVE card.
+- **Reading plan:** follows the 13-week Red Letters sermon series (Mark first, then Matthew, Luke, John, Acts, the letters, and Revelation). Week 1 starts Monday, Nov 23, 2026. Mon–Fri are reading days, Saturday is the LIVE passage, and Sunday is a rest/catch-up day. The plan lives at the top of `walk/walk.js`. To start a new round later, add `WALK_START:'YYYY-MM-DD'` (a Monday) to CONFIG.
+- **Sermon notes:** when signed in as admin, open the Daily Walk, open "Admin: sermon notes link" on the LIVE card, paste the link, and tap Save.
+- **Data:** each member's day is saved in `walk_days` (only they can read it). Run `supabase-update-daily-walk.sql` once.
+
+## Weekly Garden, card games link, Library tidy-up (Nov 25, 2026)
+- **The Weekly Garden** (`#/walk/garden`): a Sunday check-in. Slide 8 parts of life from 1 to 10 and watch your flower grow. Look back with God, then pick one bed to water with one small step. Next week it asks "Did you do it?". Saved with your Daily Walk (no new database table). Shows big on Sundays in Daily Walk, small on other days.
+- **Card games:** the Fun Room links to the sister site's card games. Change `CARDS_URL` in CONFIG (empty = hidden).
+- **Library:** "Teachings" is now "Sermon Notes" and the "Coming Soon" row is gone (run `supabase-update-library.sql` once). Admin can now remove any empty row with the Remove button.

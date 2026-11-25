@@ -57,6 +57,7 @@ const CONFIG = {
   ],
   SEEDS_STRIPE_URL: 'https://buy.stripe.com/9B6eVdgptdQqfdo1Ih38409',                 // Stripe payment link for The Seven Seeds
   SEEDS_PRICE: '$27',
+  CARDS_URL: 'https://talk.mindonesbusiness.com/',   // card games on the sister site (shown in the Fun Room)
   BIO_LIMIT: 160,
   PDFJS: {
     lib:    'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs',
@@ -432,7 +433,7 @@ const PLANS = {
 
 /* ============ PREVIEW DATA (only used when Supabase keys are missing) ============ */
 const PREVIEW = {
-  rows:[{id:1,name:'The Red Letters',sort:1},{id:2,name:'Gospel of Thomas',sort:2},{id:3,name:'Teachings',sort:3},{id:4,name:'Study Guides',sort:4},{id:5,name:'Coming Soon',sort:5}],
+  rows:[{id:1,name:'The Red Letters',sort:1},{id:2,name:'Gospel of Thomas',sort:2},{id:3,name:'Sermon Notes',sort:3},{id:4,name:'Study Guides',sort:4}],
   volumes:[
     {id:'rl-matthew',title:'Red Letters: Matthew',subtitle:'Every word Jesus spoke in Matthew.',status:'live',sort:1,kind:'pdf',tier:'free',row_id:1},
     {id:'rl-john',title:'Red Letters: John',subtitle:'The words of Jesus in the Gospel of John.',status:'live',sort:2,kind:'pdf',tier:'member',row_id:1},
@@ -992,7 +993,7 @@ function shelfRow(row){
   const items = S.volumes.filter(v=>v.row_id===row.id);
   const loop = items.length >= 3;
   const cards = items.length ? (loop ? [...items.map(v=>poster(v,true)),...items.map(v=>poster(v,false)),...items.map(v=>poster(v,true))].join('') : items.map(v=>poster(v,false)).join(''))
-              : `<div class="soon"><b>Coming soon</b>New lessons will show up here.</div>`;
+              : `<div class="soon">New lessons will show up here.</div>`;
   return `<section class="shelfrow" aria-label="${esc(row.name)}"><div class="eyebrow">${esc(row.name)}</div>
     ${items.length>1?`<button class="arrow l" data-dir="-1" aria-label="Back in ${esc(row.name)}">‹</button><button class="arrow r" data-dir="1" aria-label="Next in ${esc(row.name)}">›</button>`:''}
     <div class="track" data-n="${items.length}" data-loop="${loop?1:0}">${cards}</div></section>`;
@@ -1020,7 +1021,7 @@ async function viewLibrary(){
   renderNav('library');
   $app.innerHTML = header()+'<div class="empty">Opening the Library…</div>';
   await loadLibrary();
-  $app.innerHTML = header()+hero('Library','Lessons, studies, and teachings. Swipe each row to look.')+`
+  $app.innerHTML = header()+hero('Library','Lessons, studies, and sermon notes. Swipe each row to look.')+`
   ${signedIn()?'':`<div class="card"><h2>Free to start</h2><p>Many lessons are free to open now. A free account opens the rest.</p>
     <div class="row"><a class="btn" href="#/account" onclick="authTab='up'">Make a Free Account</a><a class="btn outline" href="#/account" onclick="authTab='in'">Sign In</a></div></div>`}
   ${S.rows.map(shelfRow).join('')}
@@ -1157,7 +1158,7 @@ async function viewAdmin(){
   <div class="eyebrow">Rows</div>
   <div class="card"><p class="note">Rename a row, or add a new one. Rows show in this order.</p>
     ${S.rows.map((r,i)=>`<div class="row" style="margin-top:10px"><input data-rname="${r.id}" value="${esc(r.name)}" maxlength="40" aria-label="Row name" style="flex:1;min-width:150px">
-      <button class="btn quiet small" data-rup="${r.id}" ${i===0?'disabled':''} aria-label="Move up">↑</button><button class="btn outline small" data-rsave="${r.id}">Save</button></div>`).join('')}
+      <button class="btn quiet small" data-rup="${r.id}" ${i===0?'disabled':''} aria-label="Move up">↑</button><button class="btn outline small" data-rsave="${r.id}">Save</button>${(S.allVolumes||S.volumes).some(v=>v.row_id===r.id)?'':`<button class="btn quiet small" data-rdel="${r.id}" aria-label="Remove this empty row">Remove</button>`}</div>`).join('')}
     <div class="row" style="margin-top:16px"><input id="newRow" maxlength="40" placeholder="New row name" style="flex:1;min-width:150px"><button class="btn small" id="addRow">Add row</button></div></div>
   <div class="eyebrow">In the Library</div>
   <div class="card">${items.length ? items.map(v=>`<div class="adm-item"><div style="min-width:0;flex:1"><b>${esc(v.title)}</b>
@@ -1209,6 +1210,9 @@ async function viewAdmin(){
   $app.querySelectorAll('[data-rsave]').forEach(b=>b.onclick=async()=>{ const name=$app.querySelector(`[data-rname="${b.dataset.rsave}"]`).value.trim(); if(!name) return toast('Please add a name.');
     if(S.preview){ PREVIEW.rows.find(r=>r.id==b.dataset.rsave).name=name; toast('Preview: saved.'); return viewAdmin(); }
     const { error } = await S.sb.from('library_rows').update({name}).eq('id',+b.dataset.rsave); toast(error?error.message:'Row renamed.'); viewAdmin(); });
+  $app.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=async()=>{ const r=S.rows.find(x=>x.id==b.dataset.rdel); if(!r || !confirm(`Remove the empty row "${r.name}"?`)) return;
+    if(S.preview){ PREVIEW.rows.splice(PREVIEW.rows.indexOf(r),1); toast('Preview: row removed.'); return viewAdmin(); }
+    const { error } = await S.sb.from('library_rows').delete().eq('id',r.id); toast(error?error.message:'Row removed.'); viewAdmin(); });
   $app.querySelectorAll('[data-rup]').forEach(b=>b.onclick=async()=>{ const i=S.rows.findIndex(r=>r.id==b.dataset.rup); if(i<1) return; const a=S.rows[i-1], c=S.rows[i];
     if(S.preview){ [a.sort,c.sort]=[c.sort,a.sort]; PREVIEW.rows.sort((x,y)=>x.sort-y.sort); return viewAdmin(); }
     await S.sb.from('library_rows').update({sort:c.sort}).eq('id',a.id); const { error } = await S.sb.from('library_rows').update({sort:a.sort}).eq('id',c.id); if(error) toast(error.message); viewAdmin(); });
@@ -1323,7 +1327,7 @@ function funCard(){ return `<a class="card" href="#/fun" style="display:flex;gap
   <span style="width:52px;height:52px;flex:none;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--lime));color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px" aria-hidden="true">🎲</span>
   <span><b style="font-family:var(--serif);font-size:21px;display:block">Fun Room</b><span class="note">Word games, race games, checkers, a friendly mystery, and more. Play together.</span></span></a>`; }
 let funLoading=null;
-function loadFun(){ return funLoading ||= new Promise((ok,bad)=>{ const sc=document.createElement('script'); sc.src='games/games.js?v=4'; sc.onload=ok; sc.onerror=()=>{ funLoading=null; bad(new Error('The Fun Room did not load. Check your connection and try again.')); }; document.head.appendChild(sc); }); }
+function loadFun(){ return funLoading ||= new Promise((ok,bad)=>{ const sc=document.createElement('script'); sc.src='games/games.js?v=5'; sc.onload=ok; sc.onerror=()=>{ funLoading=null; bad(new Error('The Fun Room did not load. Check your connection and try again.')); }; document.head.appendChild(sc); }); }
 async function loadRooms(){ if(S.preview){ S.rooms=PREVIEW.rooms; return; } const { data } = await S.sb.from('forum_rooms').select('*').order('sort'); S.rooms=data||[]; }
 const prayerRoom = id => S.rooms.find(r=>r.id===id)?.kind==='prayer';
 const covRoom = id => S.rooms.find(r=>r.id===id)?.kind==='covenant';
@@ -1539,7 +1543,7 @@ function bindPrefs(){
 const SEED_ICON = `<span style="width:52px;height:52px;flex:none;border-radius:14px;background:#FFF8E1;border:1px solid #EBD9A2;display:flex;align-items:center;justify-content:center" aria-hidden="true"><svg viewBox="0 0 32 32" width="34" height="34"><path d="M16 27V14" stroke="#17733A" stroke-width="2.4" stroke-linecap="round"/><path d="M16 16C9 16 6 11 6 6c6 0 10 3 10 10z" fill="#239E46"/><path d="M16 13c0-6 4-9 10-9 0 6-4 9-10 9z" fill="#65D916"/><ellipse cx="16" cy="28" rx="10" ry="2.5" fill="#B08A5A"/></svg></span>`;
 const hasSeeds = () => admin() || (!S.preview && !!S.profile?.has_seeds) || (S.preview && !!S.demoSeeds);
 let walkLoading=null;
-function loadWalk(){ return walkLoading ||= new Promise((ok,bad)=>{ const sc=document.createElement('script'); sc.src='walk/walk.js?v=1'; sc.onload=ok; sc.onerror=()=>{ walkLoading=null; bad(new Error('Daily Walk did not load. Please try again.')); }; document.head.appendChild(sc); }); }
+function loadWalk(){ return walkLoading ||= new Promise((ok,bad)=>{ const sc=document.createElement('script'); sc.src='walk/walk.js?v=2'; sc.onload=ok; sc.onerror=()=>{ walkLoading=null; bad(new Error('Daily Walk did not load. Please try again.')); }; document.head.appendChild(sc); }); }
 let seedsLoading=null;
 function loadSeeds(){ return seedsLoading ||= new Promise((ok,bad)=>{ const sc=document.createElement('script'); sc.src='seeds/seeds.js?v=2'; sc.onload=ok; sc.onerror=()=>{ seedsLoading=null; bad(new Error('The Seven Seeds did not load. Please try again.')); }; document.head.appendChild(sc); }); }
 async function myApplication(){ if(S.preview||!S.user) return S.demoApp||null; const { data } = await S.sb.from('member_applications').select('*').eq('user_id',S.user.id).maybeSingle(); return data; }

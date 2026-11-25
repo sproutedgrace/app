@@ -147,6 +147,10 @@ html.night .wk-step.done{background:linear-gradient(180deg,#1F2A20,var(--paper))
 .wk-live{background:linear-gradient(160deg,#1E6B34,#239E46);color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:14px}
 .wk-live h2{color:#fff;font-size:22px}.wk-live p{color:#EFFFEF}.wk-live .btn.outline{background:transparent;color:#fff;border-color:#fff}
 .wk-live a.btn.gold{background:var(--gold);color:#2B2E28;border-color:var(--gold)}
+.gd-bed{margin:12px 0}.gd-lab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.gd-lab .note{margin:0}.gd-bed label{margin:0;font-weight:700}
+.gd-row{display:flex;align-items:center;gap:12px}.gd-row input{flex:1;accent-color:var(--green)}.gd-row b{font-family:var(--serif);font-size:22px;width:28px;text-align:right;color:var(--green-ink)}
+.gd-past{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}.gd-mini{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--muted);font-size:13px;font-weight:600}
+.gd-card{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--text)}
 .wk-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
 `;
 let styled=false;
@@ -154,6 +158,9 @@ function style(){ if(styled) return; styled=true; const s=document.createElement
 const checkBtn = (on, key, label) => `<button class="wk-check ${on?'on':''}" data-done="${key}" aria-pressed="${!!on}"><i>${on?'✓':''}</i>${on?'Done':label}</button>`;
 const ta = (id, label, val, ph='') => `<label for="${id}">${label}</label><textarea id="${id}" data-f="${id.slice(2)}" maxlength="2000" style="min-height:80px" placeholder="${esc(ph)}">${esc(val||'')}</textarea>`;
 
+function gardenCard(big, g){
+  return `<a class="card gd-card" href="#/walk/garden" style="${big?'border:2px solid var(--gold)':''}"><span style="flex:none">${flower(g?.scores||{god:6,people:5,body:7,heart:5,work:6,money:4,rest:8,serve:5},big?72:52)}</span><span><b style="font-family:var(--serif);font-size:${big?22:19}px;display:block">${big?'Sunday: walk your garden':'The Weekly Garden'}</b><span class="note">${g?.done?'Done this week. 🌻 Tap to look again.':big?'A 10-minute check-in on each part of your life. Pick one small step for the week.':'Your weekly check-in. Best on Sundays.'}</span></span></a>`;
+}
 async function viewDay(date){
   renderNav('home');
   const td=dkey(new Date()); date = date || td;
@@ -182,6 +189,7 @@ async function viewDay(date){
     <p class="note" style="margin-top:8px">${doneCount(d)===5?'You walked the whole day with God. 🌿':'Take it one step at a time. Every step counts.'} <span id="wkSaved" class="meta"></span></p></div>
   <div class="wk-nav"><button class="btn quiet small" id="wkPrev">‹ ${esc(parse(addDays(date,-1)).toLocaleDateString(undefined,{weekday:'short'}))}</button>${date!==td?'<button class="btn outline small" id="wkToday">Today</button>':''}<button class="btn quiet small" id="wkNext" ${date>=td?'disabled':''}>${esc(parse(addDays(date,1)).toLocaleDateString(undefined,{weekday:'short'}))} ›</button></div>
   ${p.live||p.sunday||p.before?live:''}
+  ${parse(date).getDay()===0?gardenCard(true, d.garden):''}
   <div class="wk-sec">Morning</div>
   <div class="wk-step ${d.read?'done':''}"><h2><span class="wk-num">1</span>Read<span class="wk-min">15 min</span></h2>${readBody}
     <label for="wkline">One line that stood out to me</label><input id="wkline" data-f="line" maxlength="300" value="${esc(d.line||'')}" placeholder="Copy a verse or write it in your words">
@@ -204,6 +212,7 @@ async function viewDay(date){
     ${ta('wkeve','Before I sleep, I give thanks for…',d.eve,'')}
     <div class="card dash" style="margin:12px 0 0;box-shadow:none"><p class="tagline" style="font-size:18px;margin:0">"Father, thank You for today. I give You what I carried. Give me rest tonight, and new strength in the morning."</p><p class="note" style="margin-top:6px">Pray this, or use your own words.</p></div>
     ${checkBtn(d.evening,'evening','I read, gave thanks, and prayed for rest')}</div>
+  ${parse(date).getDay()===0?'':gardenCard(false)}
   <div class="card"><h2 style="font-size:20px">A gentle reminder</h2><p class="note">Add a daily reminder to your phone's calendar. It will nudge you at the time you pick.</p>
     <div class="row"><input id="wkTime" type="time" value="${esc(store('sg.walk.time')||'06:30')}" style="width:auto"><button class="btn outline small" id="wkICS">Add to my calendar</button></div></div>
   ${footer()}`;
@@ -235,15 +244,69 @@ async function viewDay(date){
     if(S.preview){ const n=store('sg.walk.notes')||{}; n[wNow]=url; store('sg.walk.notes',n); notes=null; toast('Preview: saved.'); return viewDay(date); }
     const { error } = await S.sb.from('sermon_weeks').upsert({week:wNow, notes_url:url||null}); if(error) return toast(error.message); notes=null; toast('Saved.'); viewDay(date); };
 }
+
+// ---------- The Weekly Garden: a Sunday check-in on each part of life ----------
+const BEDS=[['god','With God','🙏'],['people','Family & friends','🏡'],['body','Body & health','🌿'],['heart','Mind & heart','💭'],['work','Work & calling','🛠️'],['money','Money & giving','🤲'],['rest','Rest & joy','☀️'],['serve','Serving others','🤝']];
+const bedName = k => (BEDS.find(b=>b[0]===k)||[,''])[1];
+const sundayOf = s => { const d=parse(s); return addDays(s,(7-d.getDay())%7); };
+const stage = n => n<=3?'Needs water':n<=7?'Growing':'Blooming';
+function flower(sc, size=220){
+  const n=BEDS.length, c=50; let petals='';
+  BEDS.forEach((b,i)=>{ const v=Math.max(1,+sc[b[0]]||0), L=8+v*3.6, a=(i/n)*360-90;
+    petals+=`<ellipse cx="${c}" cy="${c-L/2-6}" rx="${4.2+v*0.35}" ry="${L/2}" transform="rotate(${a+90} ${c} ${c})" fill="${v>=8?'var(--lime)':'var(--green)'}" fill-opacity="${0.35+v*0.06}" stroke="var(--green-ink)" stroke-width=".6"/>`; });
+  let ticks=''; BEDS.forEach((b,i)=>{ const a=((i/n)*360-90)*Math.PI/180; ticks+=`<text x="${c+47*Math.cos(a)}" y="${c+47*Math.sin(a)+2}" font-size="6" text-anchor="middle">${b[2]}</text>`; });
+  return `<svg viewBox="-4 -4 108 108" width="${size}" height="${size}" role="img" aria-label="Your garden flower"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--line)" stroke-dasharray="2 2"/>${petals}<circle cx="50" cy="50" r="7" fill="var(--gold)" stroke="#fff" stroke-width="1.2"/>${size>80?ticks:''}</svg>`;
+}
+async function viewGarden(wk){
+  renderNav('home');
+  const td=dkey(new Date()); wk = sundayOf(wk || td);
+  if(!signedIn()){ $app.innerHTML=header()+hero('The Weekly Garden','Once a week, look at each part of your life like a garden bed.')+joinGate('Free account needed','Make a free account so your garden is saved to you.')+footer(); return; }
+  $app.innerHTML=header()+'<div class="empty">Opening your garden…</div>';
+  const prev=addDays(wk,-7);
+  const [rec, last, rows] = await Promise.all([load(wk), load(prev), history()]);
+  const g = {scores:{}, ...(rec.garden||{})}; const lg = last.garden||null;
+  const past = rows.filter(r=>r.data?.garden?.scores && r.day!==wk).slice(0,8);
+  const fresh = !Object.keys(g.scores).length;
+  if(fresh && lg?.scores) g.scores={...lg.scores};
+  BEDS.forEach(b=>{ if(!g.scores[b[0]]) g.scores[b[0]]=5; });
+  $app.innerHTML = header()+`<div class="reader-head"><button class="back" onclick="location.hash='#/walk'">‹ Daily Walk</button></div>
+  <div class="wk-hero"><h1>The Weekly Garden</h1><p class="meta">Week ending ${esc(nice(wk))}</p>
+    <p style="margin-top:8px">Your life is like a garden with many beds. Once a week, walk through it with God. What is growing? What needs water? About 10 minutes. <span id="wkSaved" class="meta"></span></p></div>
+  ${lg?.step?`<div class="card" style="border-left:4px solid var(--gold)"><p class="meta" style="margin:0">LAST WEEK YOU PLANNED</p><p style="margin:4px 0"><b>${esc(bedName(lg.bed))}:</b> ${esc(lg.step)}</p>
+    <button class="wk-check ${lg.did?'on':''}" id="gdDid"><i>${lg.did?'✓':''}</i>${lg.did?'I did it!':'I did it'}</button><p class="note" style="margin-top:6px">${lg.did?'Well done. Small steps make big gardens. 🌱':'No shame if not. Every week is a fresh start.'}</p></div>`:''}
+  <div class="wk-step"><h2><span class="wk-num">1</span>Walk the garden</h2><p class="note">Slide each one. 1 means dry. 10 means full bloom. Be honest. God already knows, and He is kind.</p>
+    <div style="display:flex;justify-content:center;margin:6px 0" id="gdFlower">${flower(g.scores)}</div>
+    ${BEDS.map(b=>`<div class="gd-bed"><div class="gd-lab"><label for="gd-${b[0]}"><span aria-hidden="true">${b[2]}</span> ${esc(b[1])}</label><span class="note" id="gs-${b[0]}">${stage(g.scores[b[0]])}</span></div><div class="gd-row"><input type="range" min="1" max="10" step="1" id="gd-${b[0]}" data-bed="${b[0]}" value="${g.scores[b[0]]}"><b id="gv-${b[0]}">${g.scores[b[0]]}</b></div></div>`).join('')}</div>
+  <div class="wk-step"><h2><span class="wk-num">2</span>Look back with God</h2>
+    ${ta('gdsaw','Where did I see God this week?',g.saw,'A moment, a person, an answer to prayer')}${ta('gdthank','What am I thankful for this week?',g.thank,'')}</div>
+  <div class="wk-step"><h2><span class="wk-num">3</span>Water one bed</h2><p class="note">Pick just one part of your life. Choose one small step for this week. Small is good.</p>
+    <label for="gdbed">This week I will water…</label><select id="gdbed">${BEDS.map(b=>`<option value="${b[0]}" ${g.bed===b[0]?'selected':''}>${b[2]} ${esc(b[1])}</option>`).join('')}</select>
+    <label for="gdstep">My one small step</label><input id="gdstep" maxlength="200" value="${esc(g.step||'')}" placeholder="Call my mom on Wednesday">
+    <div class="card dash" style="margin:12px 0 0;box-shadow:none"><p class="tagline" style="font-size:18px;margin:0">"Lord, You are the gardener. Help me grow where You planted me this week."</p></div>
+    <button class="wk-check ${g.done?'on':''}" id="gdDone"><i>${g.done?'✓':''}</i>${g.done?'Garden checked':'I walked my garden'}</button></div>
+  ${past.length?`<div class="wk-sec">Past weeks</div><div class="gd-past">${past.map(r=>`<a href="#/walk/garden/${r.day}" class="gd-mini">${flower(r.data.garden.scores,72)}<span>${esc(parse(r.day).toLocaleDateString(undefined,{month:'short',day:'numeric'}))}</span></a>`).join('')}</div>`:''}
+  ${footer()}`;
+  const q=id=>document.getElementById(id);
+  const put=()=>{ const r={...rec, garden:g}; save(wk,r); };
+  const putSoon=()=>{ const r={...rec, garden:g}; save(wk,r); };
+  $app.querySelectorAll('[data-bed]').forEach(el=>el.addEventListener('input',()=>{ const k=el.dataset.bed, v=+el.value; g.scores[k]=v; q('gv-'+k).textContent=v; q('gs-'+k).textContent=stage(v); q('gdFlower').innerHTML=flower(g.scores); putSoon(); }));
+  q('gdsaw').addEventListener('input',e=>{ g.saw=e.target.value; putSoon(); });
+  q('gdthank').addEventListener('input',e=>{ g.thank=e.target.value; putSoon(); });
+  q('gdbed').addEventListener('change',e=>{ g.bed=e.target.value; put(); });
+  q('gdstep').addEventListener('input',e=>{ g.step=e.target.value; g.bed=q('gdbed').value; putSoon(); });
+  q('gdDone').onclick=()=>{ g.done=!g.done; g.bed=q('gdbed').value; const r={...rec,garden:g}; save(wk,r,true); if(g.done) toast('Your garden is tended. 🌻'); viewGarden(wk); };
+  const dd=q('gdDid'); if(dd) dd.onclick=()=>{ lg.did=!lg.did; save(prev,{...last,garden:lg},true); viewGarden(wk); };
+  if(fresh){ g.bed ||= q('gdbed').value; }
+}
 // Small card for the Home page
 async function homeCard(el){
   if(!el) return;
   const td=dkey(new Date()), p=planFor(td);
-  let line = p.before ? `The Red Letters plan starts ${nice(START)}.` : p.after ? 'Read, pray, be still, and journal.' : p.sunday ? 'Rest day. Catch up on this week\'s reading.' : `Today: ${p.label}`;
+  let line = p.before ? `The Red Letters plan starts ${nice(START)}.` : p.after ? 'Read, pray, be still, and journal.' : p.sunday ? 'Rest day. Walk your Weekly Garden today.' : `Today: ${p.label}`;
   let dots='';
   if(signedIn()){ try{ const d=await load(td); dots=`<span class="wk-dots" style="margin-top:8px">${STEPS.map(k=>`<i class="${d[k]?'on':''}"></i>`).join('')}</span>`; }catch(e){} }
   el.innerHTML = `<span style="width:52px;height:52px;flex:none;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--lime));color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px" aria-hidden="true">☀</span>
     <span><b style="font-family:var(--serif);font-size:21px;display:block">Daily Walk</b><span class="note">${esc(line)}</span>${dots}</span>`;
 }
-window.WALK = { route: async parts => { style(); clearInterval(timer.h); timer.run=false; return viewDay(parts[1]==='d' ? parts[2] : null); }, homeCard: async el => { style(); return homeCard(el); }, stop: ()=>{ clearInterval(timer.h); timer.run=false; } };
+window.WALK = { route: async parts => { style(); clearInterval(timer.h); timer.run=false; if(parts[1]==='garden') return viewGarden(parts[2]||null); return viewDay(parts[1]==='d' ? parts[2] : null); }, homeCard: async el => { style(); return homeCard(el); }, stop: ()=>{ clearInterval(timer.h); timer.run=false; } };
 })();
